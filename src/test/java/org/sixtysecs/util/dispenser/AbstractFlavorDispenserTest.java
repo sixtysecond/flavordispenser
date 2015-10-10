@@ -32,12 +32,11 @@ public class AbstractFlavorDispenserTest {
 	}
 
 	@Test
-	public void whenBackgroundRefillFive_HaveFiveAfterDispenseTest() throws InterruptedException {
+	public void whenDesiredInventoryFive_HaveFiveAfterDispenseTest() throws InterruptedException {
 
 		FlavorDispenser<Beverage, BeverageFlavor> flavorDispenser = new ConcurrentFlavorDispenser.FlavorDispenserBuilder<Beverage, BeverageFlavor>(
-				new BeverageFlavorFactory()).setRefillAmount(1)
-				.setBackgroundRefillAmount(5).build();
-		assertEquals(flavorDispenser.getInventoryCount(BeverageFlavor.COLA), 0);
+				new BeverageFlavorFactory()).setDesiredlFlavorInventory(BeverageFlavor.COLA,5).build();
+		assertEquals(flavorDispenser.getInventoryCount(BeverageFlavor.COLA), 5);
 		{
 			Beverage beverage1 = flavorDispenser.dispense(BeverageFlavor.COLA);
 			assertNotNull(beverage1);
@@ -57,19 +56,4 @@ public class AbstractFlavorDispenserTest {
 			assertEquals(flavorDispenser.getInventoryCount(BeverageFlavor.COLA), 5);
 		}
 	}
-	
-	@Test
-	public void whenBackgroundRefillDisabled_HaveNoneAfterDispenseTest() throws InterruptedException {
-
-		FlavorDispenser<Beverage, BeverageFlavor> flavorDispenser = new ConcurrentFlavorDispenser.FlavorDispenserBuilder<Beverage, BeverageFlavor>(
-				new BeverageFlavorFactory()).setRefillAmount(1)
-				.setBackgroundRefillAmount(5).setIsBackgroundRefill(false)
-				.build();
-		Beverage beverage = flavorDispenser.dispense(BeverageFlavor.COLA);
-		assertNotNull(beverage);
-		assertEquals(beverage.getBeverageFlavor(), BeverageFlavor.COLA);
-		assertEquals(flavorDispenser.getInventoryCount(BeverageFlavor.COLA), 0,
-				flavorDispenser.getInventoryCount(BeverageFlavor.COLA));
-	}
-
 }

@@ -9,12 +9,11 @@ import java.util.Map;
  * The objects dispensed may be created on demand, or they may have been created previously.
  * The instantiation parameters are determined by an enumeration (flavor).
  * <p/>
- * Dispensers maintain an inventory of instances for each flavor. Dispensers can
- * be configured to refill in the background if a flavor's inventory is below
- * the background refill threshold.
+ * Dispensers may maintain an inventory of instances for each flavor, which may be refreshed either
+ * synchronously or in the background.
  * <p/>
- * During instantiation, a dispenser should attempt to fill itself based on the
- * value of {@link FlavorDispenser#getInitialInventoryCount}.
+ * After instantiation, a dispenser should attempt to fill itself based on the
+ * value of {@link FlavorDispenser#getDesiredInventory}.
  *
  * @param <T> the type instantiated
  * @param <E> the flavor specifying the instantiation options
@@ -35,32 +34,9 @@ public interface FlavorDispenser<T, E extends Enum<E>> {
     public int getInventoryCount(E flavor);
 
     /**
-     * @return how many instances to add to the dispenser for an flavor when a
-     * dispenser is asked to dispense a flavor which is it empty of.
-     */
-    public int getRefillAmount();
-
-    /**
-     * @return whether the dispenser should attempt to refill flavors in the
-     * background when those flavors are running low.
-     */
-    public boolean isBackgroundRefill();
-
-    /**
-     * @return the threshold at which the dispenser will attempt to refill
-     * flavors in the background.
-     */
-    public int getBackgroundRefillThreshold();
-
-    /**
-     * @return the number of instances to attempt to refill in the background
-     */
-    public int getBackgroundRefillAmount();
-
-    /**
      * @return the initial flavors which the dispenser will attempt to fill
      * itself with on instantiation
      */
-    public Map<E, Integer> getInitialInventoryCount();
+    public Map<E, Integer> getDesiredInventory();
 
 }

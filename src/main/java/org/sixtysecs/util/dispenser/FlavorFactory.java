@@ -29,13 +29,13 @@ public interface FlavorFactory<T, E extends Enum<E>> {
 
 	/**
 	 * Should be implemented as
-	 * 
+	 *
 	 * <pre>
-	 * return EnumSet.AllOf(YourFlavorFactoryNameGoesHere.class);
+	 * return EnumSet.AllOf(YourFlavorEnum.class);
 	 * </pre>
-	 * 
+	 *
 	 * Helper method needed for generic code to iterate through enumerator.
-	 * 
+	 *
 	 * @return an EnumSet containing all flavors which the factory can produce.
 	 *         (A factory should be able to produce an instance for each flavor
 	 *         defined in its enumerator).
