@@ -1,9 +1,8 @@
 package org.sixtysecs.util.dispenser;
 
-import org.apache.log4j.Logger;
-
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -23,19 +22,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @param <T> the type instantiated
  * @param <E> the flavor specifying the instantiation options
  */
-public class ConcurrentFlavorDispenser<T, E extends Enum<E>> implements
+public class ConcurrentFlavorDispenser<T, E extends Enum<E>> extends AbstractDispenser<T, E> implements
         FlavorDispenser<T, E> {
-
-    protected final Logger logger = Logger.getLogger(ConcurrentFlavorDispenser.class);
 
     private final int threadCount;
     private final int timeoutMinutes;
-
-    private final Map<E, Integer> desiredInventory;
-    private final FlavorFactory<T, E> flavorFactory;
-
-    private final Map<E, ConcurrentLinkedQueue<T>> flavorInventory = new ConcurrentHashMap<E, ConcurrentLinkedQueue<T>>();
-    private final Map<E, AtomicInteger> flavorDispensedCountMap = new ConcurrentHashMap<E, AtomicInteger>();
 
     /**
      * Can only be instantiated from builder
@@ -43,8 +34,7 @@ public class ConcurrentFlavorDispenser<T, E extends Enum<E>> implements
      * @param builder
      */
     private ConcurrentFlavorDispenser(FlavorDispenserBuilder<T, E> builder) {
-        this.desiredInventory = builder.desiredInventory;
-        this.flavorFactory = builder.flavorFactory;
+        super(builder.desiredInventory, builder.flavorFactory);
         this.threadCount = builder.nThreads;
         this.timeoutMinutes = builder.timeoutMinutes;
         for (E flavor : flavorFactory.getAllFlavors()) {
@@ -55,45 +45,8 @@ public class ConcurrentFlavorDispenser<T, E extends Enum<E>> implements
         backgroundRefillAll();
     }
 
-    public int getInventoryCount(E flavor) {
-        return flavorInventory.get(flavor)
-                .size();
-    }
-
-
-    public Map<E, Integer> getDesiredInventory() {
-        return desiredInventory;
-    }
-
-    private Map<E,Integer> getOrder() {
-        Map<E, Integer> order = new ConcurrentHashMap<E, Integer>();
-        for ( E flavor : flavorFactory.getAllFlavors()) {
-            order.put(flavor, getFlavorOrderCount(flavor));
-        }
-        return order;
-    }
-
-    private Map<E,Integer> getFlavorOrder ( E flavor) {
-        Map<E, Integer> order = new ConcurrentHashMap<E, Integer>();
-        order.put(flavor, getFlavorOrderCount(flavor));
-        return order;
-    }
-
-    private int getFlavorOrderCount(E flavor) {
-        final int actualCount = flavorInventory.get(flavor)
-                .size();
-        final int expectedCount = desiredInventory.get(flavor);
-        int orderSize = expectedCount - actualCount;
-
-        if (orderSize < 0) {
-            orderSize = 0;
-        }
-        return orderSize;
-    }
-
 
     public T dispense(E flavor) {
-
         flavorDispensedCountMap.get(flavor)
                 .incrementAndGet();
         logger.debug("dispenseCountMap=" + flavorDispensedCountMap);
@@ -118,30 +71,22 @@ public class ConcurrentFlavorDispenser<T, E extends Enum<E>> implements
 
 
     private void fulfillOrder(final Map<E, Integer> order) {
-        addNewStock(new FlavorFactoryExecutor<T, E>(flavorFactory,
+        addStockToInventory(new FlavorFactoryExecutor<T, E>(flavorFactory,
                 order, threadCount, timeoutMinutes).execute());
     }
 
-    private void addNewStock(Map<E, List<T>> flavorInstanceMap) {
-        for (E flavor : flavorFactory.getAllFlavors()) {
-            for (T instance : flavorInstanceMap.get(flavor)) {
-                flavorInventory.get(flavor)
-                        .add(instance);
-            }
-        }
-    }
 
     public void backgroundRefillAll() {
         for ( E flavor : flavorFactory.getAllFlavors()) {
             Map<E, Integer> order = getFlavorOrder(flavor);
-            addNewStock(new FlavorFactoryExecutor<T, E>(flavorFactory,
+            addStockToInventory(new FlavorFactoryExecutor<T, E>(flavorFactory,
                     order, threadCount, timeoutMinutes).execute());
         }
     }
 
     public void backgroundRefill(E flavor) {
         Map<E, Integer> order = getFlavorOrder(flavor);
-        addNewStock(new FlavorFactoryExecutor<T, E>(flavorFactory,
+        addStockToInventory(new FlavorFactoryExecutor<T, E>(flavorFactory,
                 order, threadCount, timeoutMinutes).execute());
     }
 
