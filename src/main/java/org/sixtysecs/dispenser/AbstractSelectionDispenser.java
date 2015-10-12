@@ -37,6 +37,16 @@ public class AbstractSelectionDispenser<T, E extends Enum<E>>
         return inventoryCount;
     }
 
+    public int getSelectionInventoryCount(E selection) {
+        Map<E, Integer> inventoryCount = new HashMap<E, Integer>();
+        Integer count = inventory.get(selection)
+                .size();
+        if (count == null) {
+            count = 0;
+        }
+        return count;
+    }
+
 
     public void addInventory(E selection, Collection<T> newInventory) {
         Queue<T> selectionList = inventory.get(selection);
