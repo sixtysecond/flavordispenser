@@ -4,7 +4,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by edriggs on 10/11/15.
+ * A thread-safe dispenser which refills its inventory on instantiation and after dispensing a selection.
+ *
+ * @param <T>
+ * @param <E>
  */
 public class SelfRefillingSelectionDispenser<T, E extends Enum<E>> extends AbstractSelectionDispenser<T, E> {
 
