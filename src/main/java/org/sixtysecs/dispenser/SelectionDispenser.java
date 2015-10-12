@@ -6,9 +6,6 @@ import java.util.*;
  * A selection dispenser is like a vending machine for objects.
  * All objects dispensed are the same type,
  * but their properties are determined by which selection was dispensed.
- * <p/>
- * <p/>
- * <p/>
  *
  * @param <T> the type instantiated
  * @param <E> an enumeration of selections
@@ -28,6 +25,11 @@ public interface SelectionDispenser<T, E extends Enum<E>> {
      */
     public Map<E, Integer> getInventoryCount();
 
+    /**
+     *
+     * @param selection the selection to put the instances into
+     * @param newInventory the new instances to add to the dispenser
+     */
     public void addInventory(E selection, Collection<T> newInventory);
 
     public Set<E> getSelections();
