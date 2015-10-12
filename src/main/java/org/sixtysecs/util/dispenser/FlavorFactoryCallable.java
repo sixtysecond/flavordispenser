@@ -36,7 +36,7 @@ class FlavorFactoryCallable<T, E extends Enum<E>> implements Callable<T> {
     /**
      * @returns an instance from the factory . May be null.
      */
-    public T call() throws Exception {
+    public T call()  {
         return flavorFactory.newInstance(flavor);
     }
 }

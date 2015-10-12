@@ -14,36 +14,28 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class AbstractDispenser<T, E extends Enum<E>> implements FlavorDispenser<T, E> {
     protected final Logger logger = Logger.getLogger(AbstractDispenser.class);
 
+    protected final Map<E, ConcurrentLinkedQueue<T>> flavorInventory = new ConcurrentHashMap<E, ConcurrentLinkedQueue<T>>();
+    protected final Map<E, AtomicInteger> flavorDispensedCountMap = new ConcurrentHashMap<E, AtomicInteger>();
 
     protected final Map<E, Integer> desiredInventory;
     protected final FlavorFactory<T, E> flavorFactory;
-    protected final Map<E, ConcurrentLinkedQueue<T>> flavorInventory = new ConcurrentHashMap<E, ConcurrentLinkedQueue<T>>();
-    protected final Map<E, AtomicInteger> flavorDispensedCountMap = new ConcurrentHashMap<E, AtomicInteger>();
+
 
     protected AbstractDispenser(Map<E, Integer> desiredInventory, FlavorFactory<T, E> flavorFactory) {
         this.desiredInventory = desiredInventory;
         this.flavorFactory = flavorFactory;
     }
 
-    protected void addStockToInventory(Map<E, List<T>> flavorInstanceMap) {
-        for (E flavor : flavorFactory.getAllFlavors()) {
-            for (T instance : flavorInstanceMap.get(flavor)) {
-                flavorInventory.get(flavor)
-                        .add(instance);
-            }
-        }
+    public int getInventoryCount(E flavor) {
+        return flavorInventory.get(flavor).size();
     }
 
     public Map<E, Integer> getDesiredInventory() {
         return desiredInventory;
     }
 
-    public int getInventoryCount(E flavor) {
-        return flavorInventory.get(flavor)
-                .size();
-    }
 
-    protected Map<E, Integer> getOrder() {
+    protected Map<E, Integer> calculateOrder() {
         Map<E, Integer> order = new ConcurrentHashMap<E, Integer>();
         for (E flavor : flavorFactory.getAllFlavors()) {
             order.put(flavor, getFlavorOrderCount(flavor));
@@ -51,7 +43,7 @@ public abstract class AbstractDispenser<T, E extends Enum<E>> implements FlavorD
         return order;
     }
 
-    protected Map<E, Integer> getFlavorOrder(E flavor) {
+    protected Map<E, Integer> calculateOrder(E flavor) {
         Map<E, Integer> order = new ConcurrentHashMap<E, Integer>();
         order.put(flavor, getFlavorOrderCount(flavor));
         return order;
@@ -68,5 +60,32 @@ public abstract class AbstractDispenser<T, E extends Enum<E>> implements FlavorD
         }
         return orderSize;
     }
+
+    public abstract Map<E,List<T>> fulfillOrder(Map<E, Integer> order ) ;
+
+    /**** Add stock ****/
+    protected void addStockToInventory(Map<E, List<T>> flavorInstanceMap) {
+        for (E flavor : flavorFactory.getAllFlavors()) {
+            for (T instance : flavorInstanceMap.get(flavor)) {
+                flavorInventory.get(flavor)
+                                .add(instance);
+            }
+        }
+    }
+
+    public void refillAllFlavors() {
+        for ( E flavor : flavorFactory.getAllFlavors()) {
+            Map<E, Integer> order = calculateOrder(flavor);
+            Map<E, List<T>> stock = fulfillOrder(order);
+            addStockToInventory(stock);
+        }
+    }
+
+    public void refillFlavor(E flavor) {
+        Map<E, Integer> order = calculateOrder(flavor);
+        Map<E, List<T>> stock = fulfillOrder(order);
+        addStockToInventory(stock);
+    }
+
 
 }

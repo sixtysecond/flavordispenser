@@ -1,5 +1,6 @@
 package org.sixtysecs.util.dispenser;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -56,7 +57,7 @@ public class ConcurrentFlavorDispenser<T, E extends Enum<E>> extends AbstractDis
             T instance = flavorQueue.poll();
 
             if (instance == null) {
-                new RefillOperation<E,T>(this, flavor).run();;
+                addStockToInventory(fulfillOrder(calculateOrder(flavor)));
                 instance = flavorQueue.poll();
                 if (instance == null) {
                     throw new NullPointerException("Unable to dispense: "
@@ -69,23 +70,21 @@ public class ConcurrentFlavorDispenser<T, E extends Enum<E>> extends AbstractDis
 
     }
 
-
-    private void fulfillOrder(final Map<E, Integer> order) {
-        addStockToInventory(new FlavorFactoryExecutor<T, E>(flavorFactory,
-                order, threadCount, timeoutMinutes).execute());
+    public Map<E, List<T>> fulfillOrder(final Map<E, Integer> order) {
+        return new FlavorFactoryExecutor<T, E>(flavorFactory,
+                                order, threadCount, timeoutMinutes).execute();
     }
-
 
     public void backgroundRefillAll() {
         for ( E flavor : flavorFactory.getAllFlavors()) {
-            Map<E, Integer> order = getFlavorOrder(flavor);
+            Map<E, Integer> order = calculateOrder(flavor);
             addStockToInventory(new FlavorFactoryExecutor<T, E>(flavorFactory,
                     order, threadCount, timeoutMinutes).execute());
         }
     }
 
     public void backgroundRefill(E flavor) {
-        Map<E, Integer> order = getFlavorOrder(flavor);
+        Map<E, Integer> order = calculateOrder(flavor);
         addStockToInventory(new FlavorFactoryExecutor<T, E>(flavorFactory,
                 order, threadCount, timeoutMinutes).execute());
     }
@@ -200,20 +199,5 @@ public class ConcurrentFlavorDispenser<T, E extends Enum<E>> extends AbstractDis
             return new ConcurrentFlavorDispenser<T, E>(this);
         }
 
-    }
-
-    private static class RefillOperation<E extends Enum<E>, T> implements Runnable {
-
-        private ConcurrentFlavorDispenser dispenser;
-        private E flavor;
-
-        private RefillOperation(ConcurrentFlavorDispenser dispenser, E flavor) {
-            this.dispenser = dispenser;
-            this.flavor = flavor;
-        }
-
-        public void run() {
-            dispenser.fulfillOrder(dispenser.getFlavorOrder(flavor));
-        }
     }
 }
