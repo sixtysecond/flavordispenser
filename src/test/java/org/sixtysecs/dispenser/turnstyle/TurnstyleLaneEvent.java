@@ -1,4 +1,4 @@
-package org.sixtysecs.dispenser;
+package org.sixtysecs.dispenser.turnstyle;
 
 import com.sun.corba.se.impl.orbutil.threadpool.TimeoutException;
 

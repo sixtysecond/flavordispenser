@@ -1,4 +1,4 @@
-package org.sixtysecs.dispenser;
+package org.sixtysecs.dispenser.crayon;
 
 /**
  * Created by edriggs on 10/11/15.

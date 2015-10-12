@@ -1,4 +1,4 @@
-package org.sixtysecs.dispenser;
+package org.sixtysecs.dispenser.turnstyle;
 
 import com.sun.corba.se.impl.orbutil.threadpool.TimeoutException;
 import org.testng.Assert;
@@ -23,7 +23,7 @@ public class TurnstyleLaneEventTest {
     }
 
     @Test
-    public void waitForEventReturnsExistingEvent() throws TimeoutException {
+    public void fireEventBeforeWaitTest() throws TimeoutException {
         final TurnstyleLane lane = TurnstyleLane.ONE;
         TurnstyleLaneEvent.fireLaneEvent(lane);
         TurnstyleLaneEvent event = TurnstyleLaneEvent.waitForEvent(lane, 0l);
@@ -32,7 +32,7 @@ public class TurnstyleLaneEventTest {
     }
 
     @Test
-    public void waitForEventReturnsEventCreatedAfterRequest() throws TimeoutException, InterruptedException {
+    public void fireEventBeforeTimeoutTest() throws TimeoutException, InterruptedException {
         final TurnstyleLane lane = TurnstyleLane.ONE;
 
         TurnstyleLaneEvent.WaitForCallable waitForCallable = new TurnstyleLaneEvent.WaitForCallable(lane, 100);
@@ -51,7 +51,7 @@ public class TurnstyleLaneEventTest {
     }
 
     @Test
-    public void waitForEventTimesOutWhenEventCreatedAfterTimeout() throws TimeoutException, InterruptedException {
+    public void fireEventAfterTimeoutTest() throws TimeoutException, InterruptedException {
 
         final TurnstyleLane lane = TurnstyleLane.ONE;
 

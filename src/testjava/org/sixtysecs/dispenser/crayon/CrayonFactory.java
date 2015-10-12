@@ -1,4 +1,6 @@
-package org.sixtysecs.dispenser;
+package org.sixtysecs.dispenser.crayon;
+
+import org.sixtysecs.dispenser.SelectionFactory;
 
 import java.util.ArrayList;
 import java.util.List;

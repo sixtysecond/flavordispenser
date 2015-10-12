@@ -1,6 +1,7 @@
 package org.sixtysecs.dispenser;
 
 import org.junit.Test;
+import org.sixtysecs.dispenser.crayon.*;
 import org.testng.Assert;
 
 import java.util.*;
