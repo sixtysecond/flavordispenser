@@ -12,11 +12,13 @@ public class TurnstyleController {
 
     private long pollWaitMillis = 10;
 
-    private ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleEvent>> laneEventMap =
-            new ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleEvent>>();
+    private ConcurrentHashMap<TurnstileLane, ConcurrentLinkedQueue<TurnstileEvent>> laneEvents;
 
     public TurnstyleController() {
-        initEvents();
+        laneEvents = new ConcurrentHashMap<TurnstileLane, ConcurrentLinkedQueue<TurnstileEvent>>();
+        for (TurnstileLane lane : EnumSet.allOf(TurnstileLane.class)) {
+            laneEvents.put(lane, new ConcurrentLinkedQueue<TurnstileEvent>());
+        }
     }
 
     public long getPollWaitMillis() {
@@ -25,40 +27,24 @@ public class TurnstyleController {
 
     public TurnstyleController setPollWaitMillis(long pollWaitMillis) {
         if (pollWaitMillis < 0) {
-            pollWaitMillis = 0;
+            pollWaitMillis = 1;
         }
         this.pollWaitMillis = pollWaitMillis;
         return this;
     }
 
-    private synchronized void initEvents() {
-
-
-        if (laneEventMap == null) {
-            laneEventMap = new ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleEvent>>();
-        }
-        for (TurnstyleLane lane : EnumSet.allOf(TurnstyleLane.class)) {
-            if (laneEventMap.get(lane) == null) {
-                laneEventMap.put(lane, new ConcurrentLinkedQueue<TurnstyleEvent>());
-            } else {
-                while (laneEventMap.get(lane)
-                        .poll() != null) ;
-            }
-        }
-    }
-
-    synchronized void fireLaneEvent(TurnstyleLane lane) {
-        TurnstyleEvent event = new TurnstyleEvent(lane);
-        laneEventMap.get(lane)
+    synchronized void fireLaneEvent(TurnstileLane lane) {
+        TurnstileEvent event = new TurnstileEvent(lane);
+        laneEvents.get(lane)
                 .add(event);
     }
 
 
-    public TurnstyleEvent waitForEvent(TurnstyleLane lane, long timeout) throws TimeoutException {
-        TurnstyleEvent turnstyleLaneEvent = null;
+    public TurnstileEvent waitForEvent(TurnstileLane lane, long timeout) throws TimeoutException {
+        TurnstileEvent turnstyleLaneEvent = null;
         int totalWaitTimeMillis = 0;
         do {
-            turnstyleLaneEvent = laneEventMap.get(lane)
+            turnstyleLaneEvent = laneEvents.get(lane)
                     .poll();
             if (turnstyleLaneEvent != null) {
                 break;
@@ -78,14 +64,14 @@ public class TurnstyleController {
         return turnstyleLaneEvent;
     }
 
-    public static class WaitForTurnstyleEventCallable implements Callable<TurnstyleEvent> {
+    public static class WaitForTurnstyleEventCallable implements Callable<TurnstileEvent> {
 
-        private TurnstyleLane turnstyleLane;
+        private TurnstileLane turnstyleLane;
         private TurnstyleController turnstyleController;
         private long timeout;
         private boolean isSuccess = false;
 
-        public WaitForTurnstyleEventCallable(TurnstyleLane turnstyleLane, TurnstyleController turnstyleController, long timeout) {
+        public WaitForTurnstyleEventCallable(TurnstileLane turnstyleLane, TurnstyleController turnstyleController, long timeout) {
             this.turnstyleLane = turnstyleLane;
             this.turnstyleController = turnstyleController;
             this.timeout = timeout;
@@ -96,8 +82,8 @@ public class TurnstyleController {
             return isSuccess;
         }
 
-        public TurnstyleEvent call() throws Exception {
-            TurnstyleEvent event = turnstyleController.waitForEvent(turnstyleLane, timeout);
+        public TurnstileEvent call() throws Exception {
+            TurnstileEvent event = turnstyleController.waitForEvent(turnstyleLane, timeout);
             if (event != null) {
                 isSuccess = true;
             }
@@ -107,9 +93,10 @@ public class TurnstyleController {
 
     public static class FireTurnstyleEventRunnable implements Runnable {
         private boolean isSuccess = false;
-        private TurnstyleLane turnstyleLane;
+        private TurnstileLane turnstyleLane;
         private TurnstyleController turnstyleController;
-        public FireTurnstyleEventRunnable(TurnstyleLane turnstyleLane, TurnstyleController turnstyleController) {
+
+        public FireTurnstyleEventRunnable(TurnstileLane turnstyleLane, TurnstyleController turnstyleController) {
             this.turnstyleLane = turnstyleLane;
             this.turnstyleController = turnstyleController;
         }

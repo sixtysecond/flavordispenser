@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class CrayonFactory implements SelectionFactory<Crayon, CrayonColor> {
 
+    //TODO: return map instead of list so type obvious
     public List<Crayon> create(CrayonColor selection, int count) {
         List<Crayon> crayonList = new ArrayList<Crayon>();
         for (int i = 0; i < count; i++) {
