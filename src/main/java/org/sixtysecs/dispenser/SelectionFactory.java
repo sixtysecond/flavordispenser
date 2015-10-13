@@ -16,5 +16,5 @@ public interface SelectionFactory<T, E extends Enum<E>> {
      * @param order the number of T to attempt to create for each E
      * @return a sparse map containing the T which were instantiated, grouped by selection E
      */
-    public Map<E, Collection<T>> manufacture(Map<E, Integer> order);
+    public Map<E, Collection<T>> fulfill(Map<E, Integer> order);
 }

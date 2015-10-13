@@ -49,7 +49,7 @@ public class SelfRefillingSelectionDispenser<T, E extends Enum<E>> extends Abstr
             Map<E,Integer> order = new ConcurrentHashMap<E, Integer>();
             order.put(selection, diff);
             if (diff > 0) {
-                addInventory( selectionFactory.manufacture(order));
+                addInventory( selectionFactory.fulfill(order));
             }
         }
     }

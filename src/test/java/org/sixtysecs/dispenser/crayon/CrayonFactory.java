@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CrayonFactory implements SelectionFactory<Crayon, CrayonColor> {
 
-    public Map<CrayonColor, Collection<Crayon>> manufacture(Map<CrayonColor, Integer> order) {
+    public Map<CrayonColor, Collection<Crayon>> fulfill(Map<CrayonColor, Integer> order) {
 
         Map<CrayonColor, Collection<Crayon>> newInventory = new ConcurrentHashMap<CrayonColor, Collection<Crayon>>();
         for ( Map.Entry<CrayonColor, Integer> entry : order.entrySet()) {
