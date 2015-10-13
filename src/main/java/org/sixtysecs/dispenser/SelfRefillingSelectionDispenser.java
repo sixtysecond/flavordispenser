@@ -11,8 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SelfRefillingSelectionDispenser<T, E extends Enum<E>> extends AbstractSelectionDispenser<T, E> {
 
-    private SelectionFactory<T, E> selectionFactory;
-    private Map<E, Integer> desiredInventory;
+    protected SelectionFactory<T, E> selectionFactory;
+    protected Map<E, Integer> desiredInventory;
 
     public SelfRefillingSelectionDispenser(Class tClass, SelectionFactory<T, E> selectionFactory, Map<E, Integer> desiredInventory) {
         super(tClass);
