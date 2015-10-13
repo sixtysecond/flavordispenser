@@ -1,31 +1,20 @@
 package org.sixtysecs.dispenser;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Map;
 
 /**
- * A selectionFactory instantiates objecs of type T using an enum E to define the instatiation parameters.
- * <p>
- * Each factory and its enumerator may have its own distinct set of properties
- * appropriate to the domain of instantiating that type of object.
+ * A factory for creating objects of type T whose properties are determined by E.
  *
- * @author edriggs
- *
- * @param <T>
- *            the type instantiated
- * @param <E>
- *            the selection specifying the instantiation options
+ * @param <T> the type of all objects instantiated
+ * @param <E> an enumeration of selections deterining the properties of the instantiated object.
  */
 public interface SelectionFactory<T, E extends Enum<E>> {
 
-//    /**
-//     * May return null. It is up to the factory's discretion whether to retry if
-//     * the initial attempt to instantiate fails.
-//     *
-//     * @param selection
-//     *            the selection which determines the instantiation properties
-//     * @return a new instance of the associated type or <code>NULL</code>
-//     */
-//    public T newInstance(E selection);
-
-    public List<T> create(E selection, int count);
+    /**
+     * Fulfills an order for new inventory of objets
+     * @param order the number of T to attempt to create for each E
+     * @return a sparse map containing the T which were instantiated, grouped by selection E
+     */
+    public Map<E, Collection<T>> manufacture(Map<E, Integer> order);
 }

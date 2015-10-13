@@ -15,13 +15,13 @@ public class TurnstyleLaneEventTest {
 
     @Test(expectedExceptions = {TimeoutException.class})
     public void waitTimeouExceededTest() throws TimeoutException {
-        TurnstyleController turnstyleController = new TurnstyleController();
+        TurnstileController turnstyleController = new TurnstileController();
         TurnstileEvent turnstyleLaneEvent = turnstyleController.waitForEvent(TurnstileLane.ONE, 0l);
     }
 
     @Test
     public void fireEventBeforeWaitTest() throws TimeoutException {
-        TurnstyleController turnstyleController = new TurnstyleController();
+        TurnstileController turnstyleController = new TurnstileController();
         final TurnstileLane lane = TurnstileLane.ONE;
         turnstyleController.fireLaneEvent(lane);
         TurnstileEvent event = turnstyleController.waitForEvent(lane, 0l);
@@ -31,7 +31,7 @@ public class TurnstyleLaneEventTest {
 
     @Test
     public void fireEventBeforeTimeoutTest() throws TimeoutException, InterruptedException {
-        TurnstyleController turnstyleController = new TurnstyleController();
+        TurnstileController turnstyleController = new TurnstileController();
         final TurnstileLane lane = TurnstileLane.ONE;
 
         WaitForTurnstyleEventCallable waitForCallable =
@@ -52,7 +52,7 @@ public class TurnstyleLaneEventTest {
 
     @Test
     public void fireEventAfterTimeoutTest() throws TimeoutException, InterruptedException {
-        TurnstyleController turnstyleController = new TurnstyleController();
+        TurnstileController turnstyleController = new TurnstileController();
         final TurnstileLane lane = TurnstileLane.ONE;
 
         WaitForTurnstyleEventCallable waitForCallable = new WaitForTurnstyleEventCallable(lane, turnstyleController, 100);

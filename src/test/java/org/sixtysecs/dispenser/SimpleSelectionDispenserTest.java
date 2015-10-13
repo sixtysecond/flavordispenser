@@ -5,7 +5,7 @@ import org.sixtysecs.dispenser.crayon.Crayon;
 import org.sixtysecs.dispenser.crayon.CrayonColor;
 import org.testng.Assert;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * Created by edriggs on 10/11/15.
@@ -29,7 +29,9 @@ public class SimpleSelectionDispenserTest {
     @Test
     public void hasItemsAfterRefillTest() {
         SimpleSelectionDispenser<Crayon, CrayonColor> dispenser = getCrayonDispenser();
-        dispenser.addInventory(CrayonColor.BLUE, Arrays.asList(new Crayon(CrayonColor.BLUE)));
+        Map<CrayonColor, Collection<Crayon>> newInventory = new HashMap<CrayonColor, Collection<Crayon>>();
+        newInventory.put(CrayonColor.BLUE, Arrays.asList(new Crayon(CrayonColor.BLUE)));
+        dispenser.addInventory(newInventory);
         Assert.assertEquals(dispenser.getInventoryCount()
                 .get(CrayonColor.BLUE), ONE);
     }
@@ -37,7 +39,9 @@ public class SimpleSelectionDispenserTest {
     @Test
     public void inventoryDecreasesAfterDispenseTest() {
         SimpleSelectionDispenser<Crayon, CrayonColor> dispenser = getCrayonDispenser();
-        dispenser.addInventory(CrayonColor.BLUE, Arrays.asList(new Crayon(CrayonColor.BLUE)));
+        Map<CrayonColor, Collection<Crayon>> newInventory = new HashMap<CrayonColor, Collection<Crayon>>();
+        newInventory.put(CrayonColor.BLUE, Arrays.asList(new Crayon(CrayonColor.BLUE)));
+        dispenser.addInventory(newInventory);
         Crayon crayon = dispenser.dispense(CrayonColor.BLUE);
         Assert.assertNotNull(crayon);
         Assert.assertEquals(crayon.getCrayonColor(), CrayonColor.BLUE);

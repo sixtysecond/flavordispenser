@@ -60,7 +60,9 @@ public class SelfRefillingSelectionDispenserTest {
     @Test
     public void hasMoreItemsAfterRefillTest() {
         SelfRefillingSelectionDispenser<Crayon, CrayonColor> dispenser = getCrayonDispenser();
-        dispenser.addInventory(CrayonColor.BLUE, Arrays.asList(new Crayon(CrayonColor.BLUE)));
+        Map<CrayonColor, Collection<Crayon>> newInventory = new HashMap<CrayonColor, Collection<Crayon>>();
+        newInventory.put(CrayonColor.BLUE, Arrays.asList(new Crayon(CrayonColor.BLUE)));
+                dispenser.addInventory(newInventory);
         Assert.assertEquals(dispenser.getSelectionInventoryCount(
                 CrayonColor.BLUE), 2);
     }
@@ -68,7 +70,9 @@ public class SelfRefillingSelectionDispenserTest {
     @Test
     public void inventoryDecreasesAfterDispenseTest() {
         SelfRefillingSelectionDispenser<Crayon, CrayonColor> dispenser = getCrayonDispenser();
-        dispenser.addInventory(CrayonColor.BLUE, Arrays.asList(new Crayon(CrayonColor.BLUE)));
+        Map<CrayonColor, Collection<Crayon>> newInventory = new HashMap<CrayonColor, Collection<Crayon>>();
+        newInventory.put(CrayonColor.BLUE, Arrays.asList(new Crayon(CrayonColor.BLUE)));
+        dispenser.addInventory(newInventory);
         Crayon crayon = dispenser.dispense(CrayonColor.BLUE);
         Assert.assertNotNull(crayon);
         Assert.assertEquals(crayon.getCrayonColor(), CrayonColor.BLUE);

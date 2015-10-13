@@ -2,20 +2,26 @@ package org.sixtysecs.dispenser.crayon;
 
 import org.sixtysecs.dispenser.SelectionFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Created by edriggs on 10/11/15.
- */
 public class CrayonFactory implements SelectionFactory<Crayon, CrayonColor> {
 
-    //TODO: return map instead of list so type obvious
-    public List<Crayon> create(CrayonColor selection, int count) {
-        List<Crayon> crayonList = new ArrayList<Crayon>();
-        for (int i = 0; i < count; i++) {
-            crayonList.add(new Crayon(selection));
+    public Map<CrayonColor, Collection<Crayon>> manufacture(Map<CrayonColor, Integer> order) {
+
+        Map<CrayonColor, Collection<Crayon>> newInventory = new ConcurrentHashMap<CrayonColor, Collection<Crayon>>();
+        for ( Map.Entry<CrayonColor, Integer> entry : order.entrySet()) {
+
+            Integer count = entry.getValue();
+            if (count != null) {
+                CrayonColor selection = entry.getKey();
+                List<Crayon> crayonList = new ArrayList<Crayon>();
+                for (int i = 0; i < count; i++) {
+                    crayonList.add(new Crayon(selection));
+                }
+                newInventory.put(selection, crayonList);
+            }
         }
-        return crayonList;
+        return newInventory;
     }
 }

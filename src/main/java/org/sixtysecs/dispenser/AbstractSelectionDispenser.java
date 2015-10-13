@@ -48,9 +48,11 @@ public class AbstractSelectionDispenser<T, E extends Enum<E>>
     }
 
 
-    public void addInventory(E selection, Collection<T> newInventory) {
-        Queue<T> selectionList = inventory.get(selection);
-        selectionList.addAll(newInventory);
+    public void addInventory(Map<E, Collection<T>> newInventory) {
+        for (Map.Entry<E, Collection<T>> entry : newInventory.entrySet()) {
+            Queue<T> selectionInventory = inventory.get(entry.getKey());
+            selectionInventory.addAll(entry.getValue());
+        }
     }
 
     public Set<E> getSelections() {

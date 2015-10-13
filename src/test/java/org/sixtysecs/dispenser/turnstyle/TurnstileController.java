@@ -5,16 +5,13 @@ import com.sun.corba.se.impl.orbutil.threadpool.TimeoutException;
 import java.util.EnumSet;
 import java.util.concurrent.*;
 
-/**
- * Created by edriggs on 10/12/15.
- */
-public class TurnstyleController {
+public class TurnstileController {
 
     private long pollWaitMillis = 10;
 
     private ConcurrentHashMap<TurnstileLane, ConcurrentLinkedQueue<TurnstileEvent>> laneEvents;
 
-    public TurnstyleController() {
+    public TurnstileController() {
         laneEvents = new ConcurrentHashMap<TurnstileLane, ConcurrentLinkedQueue<TurnstileEvent>>();
         for (TurnstileLane lane : EnumSet.allOf(TurnstileLane.class)) {
             laneEvents.put(lane, new ConcurrentLinkedQueue<TurnstileEvent>());
@@ -25,7 +22,7 @@ public class TurnstyleController {
         return pollWaitMillis;
     }
 
-    public TurnstyleController setPollWaitMillis(long pollWaitMillis) {
+    public TurnstileController setPollWaitMillis(long pollWaitMillis) {
         if (pollWaitMillis < 0) {
             pollWaitMillis = 1;
         }

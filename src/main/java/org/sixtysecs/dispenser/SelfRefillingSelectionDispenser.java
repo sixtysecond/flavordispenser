@@ -46,8 +46,10 @@ public class SelfRefillingSelectionDispenser<T, E extends Enum<E>> extends Abstr
             final int actualCount = queue.size();
             final int desiredCount = desiredInventory.get(selection);
             final int diff = desiredCount - actualCount;
+            Map<E,Integer> order = new ConcurrentHashMap<E, Integer>();
+            order.put(selection, diff);
             if (diff > 0) {
-                addInventory(selection, selectionFactory.create(selection, diff));
+                addInventory( selectionFactory.manufacture(order));
             }
         }
     }

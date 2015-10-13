@@ -7,11 +7,11 @@ import java.util.concurrent.Callable;
  */
 public class WaitForTurnstyleEventCallable implements Callable {
     private TurnstileLane turnstyleLane;
-    private TurnstyleController turnstyleController;
+    private TurnstileController turnstyleController;
     private long timeout;
     private boolean isSuccess = false;
 
-    public WaitForTurnstyleEventCallable(TurnstileLane turnstyleLane, TurnstyleController turnstyleController, long timeout) {
+    public WaitForTurnstyleEventCallable(TurnstileLane turnstyleLane, TurnstileController turnstyleController, long timeout) {
         this.turnstyleLane = turnstyleLane;
         this.turnstyleController = turnstyleController;
         this.timeout = timeout;

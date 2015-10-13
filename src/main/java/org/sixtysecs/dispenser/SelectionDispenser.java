@@ -3,34 +3,36 @@ package org.sixtysecs.dispenser;
 import java.util.*;
 
 /**
- * A selection dispenser is like a vending machine for objects.
- * All objects dispensed are the same type,
- * but their properties are determined by which selection was dispensed.
+ * Dispenses objects of a single type whose properties are determined by the selection made.
+ * A vending machine for objects.
  *
- * @param <T> the type instantiated
- * @param <E> an enumeration of selections
+ * @param <T> the type dispensed
+ * @param <E> an enumeration of selections. The selection determines the properties of
+ *            the object dispensed and an inventory exists for each selection.
  * @author edriggs
  */
 public interface SelectionDispenser<T, E extends Enum<E>> {
 
     /**
-     * @param selection the selection to dispense.
-     * @return an instance, or null if unable to dispense.
+     * @return the set of enumerated selections the dispenser supports
+     */
+    public Set<E> getSelections();
+
+    /**
+     * @param selection an enumerated member which has its own inventory and determines the properties of the dispensed item.
+     *                  Similar to a product button on a vending machine.
+     * @return an instance of T, or null if unable to dispense.
      */
     public T dispense(E selection);
 
     /**
-     * @return the initial flavors which the dispenser will attempt to fill
-     * itself with on instantiation
+     * @return the current inventory count for each selection
      */
     public Map<E, Integer> getInventoryCount();
 
     /**
-     *
-     * @param selection the selection to put the instances into
-     * @param newInventory the new instances to add to the dispenser
+     * @param newInventory adds the new inventory to the existing inventory.
+     *                     for each E in the map, adds the collection of T to that selection's inventory
      */
-    public void addInventory(E selection, Collection<T> newInventory);
-
-    public Set<E> getSelections();
+    public void addInventory(Map<E, Collection<T>> newInventory);
 }

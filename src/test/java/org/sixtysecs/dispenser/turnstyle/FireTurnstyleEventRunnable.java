@@ -6,9 +6,9 @@ package org.sixtysecs.dispenser.turnstyle;
 public class FireTurnstyleEventRunnable implements Runnable{
     private boolean isSuccess = false;
     private TurnstileLane turnstyleLane;
-    private TurnstyleController turnstyleController;
+    private TurnstileController turnstyleController;
 
-    public FireTurnstyleEventRunnable(TurnstileLane turnstyleLane, TurnstyleController turnstyleController) {
+    public FireTurnstyleEventRunnable(TurnstileLane turnstyleLane, TurnstileController turnstyleController) {
         this.turnstyleLane = turnstyleLane;
         this.turnstyleController = turnstyleController;
     }
