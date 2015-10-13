@@ -1,5 +1,8 @@
 package org.sixtysecs.dispenser.crayon;
 
+/**
+ * Example type T for testing
+ */
 public class Crayon {
     private CrayonColor crayonColor;
 

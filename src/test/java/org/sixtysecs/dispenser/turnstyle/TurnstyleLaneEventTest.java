@@ -36,18 +36,18 @@ public class TurnstyleLaneEventTest {
 
         WaitForTurnstyleEventCallable waitForCallable =
                 new WaitForTurnstyleEventCallable(lane, turnstyleController, 100);
-        FireTurnstyleEventRunnable fireEventCallable = new FireTurnstyleEventRunnable(lane, turnstyleController);
+        FireTurnstyleEventRunnable fireEventRunnable = new FireTurnstyleEventRunnable(lane, turnstyleController);
         ExecutorService executor = Executors.newFixedThreadPool(2);
         executor.submit(waitForCallable);
 
         //sleep for less than timeout
         Thread.sleep(20);
 
-        executor.submit(fireEventCallable);
+        executor.submit(fireEventRunnable);
         executor.shutdown();
         executor.awaitTermination(2000, TimeUnit.MILLISECONDS);
         Assert.assertTrue(waitForCallable.isSuccess());
-        Assert.assertTrue(fireEventCallable.isSuccess());
+        Assert.assertTrue(fireEventRunnable.isSuccess());
     }
 
     @Test
@@ -56,18 +56,18 @@ public class TurnstyleLaneEventTest {
         final TurnstileLane lane = TurnstileLane.ONE;
 
         WaitForTurnstyleEventCallable waitForCallable = new WaitForTurnstyleEventCallable(lane, turnstyleController, 100);
-        FireTurnstyleEventRunnable fireEventCallable = new FireTurnstyleEventRunnable(lane, turnstyleController);
+        FireTurnstyleEventRunnable fireEventRunnable = new FireTurnstyleEventRunnable(lane, turnstyleController);
         ExecutorService executor = Executors.newFixedThreadPool(2);
         executor.submit(waitForCallable);
 
         //sleep for more than timeout
         Thread.sleep(200);
 
-        executor.submit(fireEventCallable);
+        executor.submit(fireEventRunnable);
         executor.shutdown();
         executor.awaitTermination(2000, TimeUnit.MILLISECONDS);
 
         Assert.assertFalse(waitForCallable.isSuccess());
-        Assert.assertTrue(fireEventCallable.isSuccess());
+        Assert.assertTrue(fireEventRunnable.isSuccess());
     }
 }

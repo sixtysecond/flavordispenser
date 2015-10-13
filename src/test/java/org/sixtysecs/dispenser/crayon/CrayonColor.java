@@ -1,7 +1,7 @@
 package org.sixtysecs.dispenser.crayon;
 
 /**
- * Created by edriggs on 10/11/15.
+ * Example selection E for testing
  */
 public enum CrayonColor {
     RED,//

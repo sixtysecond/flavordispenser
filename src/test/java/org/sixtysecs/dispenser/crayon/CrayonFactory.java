@@ -5,6 +5,9 @@ import org.sixtysecs.dispenser.SelectionFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Example factory for refilling selection dispenser
+ */
 public class CrayonFactory implements SelectionFactory<Crayon, CrayonColor> {
 
     public Map<CrayonColor, Collection<Crayon>> fulfill(Map<CrayonColor, Integer> order) {

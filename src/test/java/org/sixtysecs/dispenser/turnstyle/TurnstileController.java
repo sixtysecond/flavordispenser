@@ -5,6 +5,9 @@ import com.sun.corba.se.impl.orbutil.threadpool.TimeoutException;
 import java.util.EnumSet;
 import java.util.concurrent.*;
 
+/**
+ * Used for concurrency testing. Allows
+ */
 public class TurnstileController {
 
     private long pollWaitMillis = 10;
