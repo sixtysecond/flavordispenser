@@ -15,13 +15,13 @@ public class TurnstyleLaneEventTest {
 
     @Test(expectedExceptions = {TimeoutException.class})
     public void waitTimeouExceededTest() throws TimeoutException {
-        TurnstyleController turnstyleController = new TurnstyleController(10);
+        TurnstyleController turnstyleController = new TurnstyleController();
         TurnstyleEvent turnstyleLaneEvent = turnstyleController.waitForEvent(TurnstyleLane.ONE, 0l);
     }
 
     @Test
     public void fireEventBeforeWaitTest() throws TimeoutException {
-        TurnstyleController turnstyleController = new TurnstyleController(10);
+        TurnstyleController turnstyleController = new TurnstyleController();
         final TurnstyleLane lane = TurnstyleLane.ONE;
         turnstyleController.fireLaneEvent(lane);
         TurnstyleEvent event = turnstyleController.waitForEvent(lane, 0l);
@@ -31,12 +31,12 @@ public class TurnstyleLaneEventTest {
 
     @Test
     public void fireEventBeforeTimeoutTest() throws TimeoutException, InterruptedException {
-        TurnstyleController turnstyleController = new TurnstyleController(10);
+        TurnstyleController turnstyleController = new TurnstyleController();
         final TurnstyleLane lane = TurnstyleLane.ONE;
 
-        TurnstyleController.WaitForCallable waitForCallable =
-                new TurnstyleController.WaitForCallable(lane, turnstyleController, 100);
-        TurnstyleController.FireEventCallable fireEventCallable = new TurnstyleController.FireEventCallable(lane, turnstyleController);
+        TurnstyleController.WaitForTurnstyleEventCallable waitForCallable =
+                new TurnstyleController.WaitForTurnstyleEventCallable(lane, turnstyleController, 100);
+        TurnstyleController.FireTurnstyleEventRunnable fireEventCallable = new TurnstyleController.FireTurnstyleEventRunnable(lane, turnstyleController);
         ExecutorService executor = Executors.newFixedThreadPool(2);
         executor.submit(waitForCallable);
 
@@ -52,11 +52,11 @@ public class TurnstyleLaneEventTest {
 
     @Test
     public void fireEventAfterTimeoutTest() throws TimeoutException, InterruptedException {
-        TurnstyleController turnstyleController = new TurnstyleController(10);
+        TurnstyleController turnstyleController = new TurnstyleController();
         final TurnstyleLane lane = TurnstyleLane.ONE;
 
-        TurnstyleController.WaitForCallable waitForCallable = new TurnstyleController.WaitForCallable(lane, turnstyleController, 100);
-        TurnstyleController.FireEventCallable fireEventCallable = new TurnstyleController.FireEventCallable(lane, turnstyleController);
+        TurnstyleController.WaitForTurnstyleEventCallable waitForCallable = new TurnstyleController.WaitForTurnstyleEventCallable(lane, turnstyleController, 100);
+        TurnstyleController.FireTurnstyleEventRunnable fireEventCallable = new TurnstyleController.FireTurnstyleEventRunnable(lane, turnstyleController);
         ExecutorService executor = Executors.newFixedThreadPool(2);
         executor.submit(waitForCallable);
 

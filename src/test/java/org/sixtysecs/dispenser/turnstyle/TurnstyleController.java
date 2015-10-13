@@ -10,19 +10,28 @@ import java.util.concurrent.*;
  */
 public class TurnstyleController {
 
-    long waitTimeMillis;
+    private long pollWaitMillis = 10;
 
-
-    ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleEvent>> laneEventMap =
+    private ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleEvent>> laneEventMap =
             new ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleEvent>>();
 
-    public TurnstyleController( long waitTimeMillis) {
-
-        this.waitTimeMillis = waitTimeMillis;
+    public TurnstyleController() {
         initEvents();
     }
 
-    synchronized void initEvents() {
+    public long getPollWaitMillis() {
+        return pollWaitMillis;
+    }
+
+    public TurnstyleController setPollWaitMillis(long pollWaitMillis) {
+        if (pollWaitMillis < 0) {
+            pollWaitMillis = 0;
+        }
+        this.pollWaitMillis = pollWaitMillis;
+        return this;
+    }
+
+    private synchronized void initEvents() {
 
 
         if (laneEventMap == null) {
@@ -31,9 +40,9 @@ public class TurnstyleController {
         for (TurnstyleLane lane : EnumSet.allOf(TurnstyleLane.class)) {
             if (laneEventMap.get(lane) == null) {
                 laneEventMap.put(lane, new ConcurrentLinkedQueue<TurnstyleEvent>());
-            }
-            else {
-                while (laneEventMap.get(lane).poll() != null);
+            } else {
+                while (laneEventMap.get(lane)
+                        .poll() != null) ;
             }
         }
     }
@@ -55,11 +64,11 @@ public class TurnstyleController {
                 break;
             }
             try {
-                Thread.sleep(waitTimeMillis);
+                Thread.sleep(pollWaitMillis);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            totalWaitTimeMillis += waitTimeMillis;
+            totalWaitTimeMillis += pollWaitMillis;
 
         }
         while (turnstyleLaneEvent == null && totalWaitTimeMillis < timeout);
@@ -69,14 +78,14 @@ public class TurnstyleController {
         return turnstyleLaneEvent;
     }
 
-    public static class WaitForCallable implements Callable<TurnstyleEvent> {
+    public static class WaitForTurnstyleEventCallable implements Callable<TurnstyleEvent> {
 
         private TurnstyleLane turnstyleLane;
         private TurnstyleController turnstyleController;
         private long timeout;
         private boolean isSuccess = false;
 
-        public WaitForCallable(TurnstyleLane turnstyleLane, TurnstyleController turnstyleController, long timeout) {
+        public WaitForTurnstyleEventCallable(TurnstyleLane turnstyleLane, TurnstyleController turnstyleController, long timeout) {
             this.turnstyleLane = turnstyleLane;
             this.turnstyleController = turnstyleController;
             this.timeout = timeout;
@@ -88,7 +97,7 @@ public class TurnstyleController {
         }
 
         public TurnstyleEvent call() throws Exception {
-            TurnstyleEvent event =  turnstyleController.waitForEvent(turnstyleLane, timeout);
+            TurnstyleEvent event = turnstyleController.waitForEvent(turnstyleLane, timeout);
             if (event != null) {
                 isSuccess = true;
             }
@@ -96,18 +105,17 @@ public class TurnstyleController {
         }
     }
 
-    public static class FireEventCallable implements Runnable {
+    public static class FireTurnstyleEventRunnable implements Runnable {
         private boolean isSuccess = false;
-        public boolean isSuccess() {
-            return isSuccess;
-        }
-
         private TurnstyleLane turnstyleLane;
         private TurnstyleController turnstyleController;
-
-        public FireEventCallable(TurnstyleLane turnstyleLane, TurnstyleController turnstyleController) {
+        public FireTurnstyleEventRunnable(TurnstyleLane turnstyleLane, TurnstyleController turnstyleController) {
             this.turnstyleLane = turnstyleLane;
             this.turnstyleController = turnstyleController;
+        }
+
+        public boolean isSuccess() {
+            return isSuccess;
         }
 
         public void run() {
