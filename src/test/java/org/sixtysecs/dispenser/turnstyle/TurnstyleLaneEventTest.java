@@ -15,18 +15,18 @@ public class TurnstyleLaneEventTest {
 
     @BeforeMethod
     public void setup() {
-        TurnstyleLaneEvent.initEvents();
+        TurnstyleController.initEvents();
     }
     @Test(expectedExceptions = {TimeoutException.class})
     public void waitTimeouExceededTest() throws TimeoutException {
-        TurnstyleLaneEvent turnstyleLaneEvent = TurnstyleLaneEvent.waitForEvent(TurnstyleLane.ONE, 0l);
+        TurnstyleEvent turnstyleLaneEvent = TurnstyleController.waitForEvent(TurnstyleLane.ONE, 0l);
     }
 
     @Test
     public void fireEventBeforeWaitTest() throws TimeoutException {
         final TurnstyleLane lane = TurnstyleLane.ONE;
-        TurnstyleLaneEvent.fireLaneEvent(lane);
-        TurnstyleLaneEvent event = TurnstyleLaneEvent.waitForEvent(lane, 0l);
+        TurnstyleController.fireLaneEvent(lane);
+        TurnstyleEvent event = TurnstyleController.waitForEvent(lane, 0l);
         Assert.assertNotNull(event);
         Assert.assertEquals(event.getTurnstyleLane(), lane);
     }
@@ -35,8 +35,8 @@ public class TurnstyleLaneEventTest {
     public void fireEventBeforeTimeoutTest() throws TimeoutException, InterruptedException {
         final TurnstyleLane lane = TurnstyleLane.ONE;
 
-        TurnstyleLaneEvent.WaitForCallable waitForCallable = new TurnstyleLaneEvent.WaitForCallable(lane, 100);
-        TurnstyleLaneEvent.FireEventCallable fireEventCallable = new TurnstyleLaneEvent.FireEventCallable(lane);
+        TurnstyleController.WaitForCallable waitForCallable = new TurnstyleController.WaitForCallable(lane, 100);
+        TurnstyleController.FireEventCallable fireEventCallable = new TurnstyleController.FireEventCallable(lane);
         ExecutorService executor = Executors.newFixedThreadPool(2);
         executor.submit(waitForCallable);
 
@@ -55,8 +55,8 @@ public class TurnstyleLaneEventTest {
 
         final TurnstyleLane lane = TurnstyleLane.ONE;
 
-        TurnstyleLaneEvent.WaitForCallable waitForCallable = new TurnstyleLaneEvent.WaitForCallable(lane, 100);
-        TurnstyleLaneEvent.FireEventCallable fireEventCallable = new TurnstyleLaneEvent.FireEventCallable(lane);
+        TurnstyleController.WaitForCallable waitForCallable = new TurnstyleController.WaitForCallable(lane, 100);
+        TurnstyleController.FireEventCallable fireEventCallable = new TurnstyleController.FireEventCallable(lane);
         ExecutorService executor = Executors.newFixedThreadPool(2);
         executor.submit(waitForCallable);
 

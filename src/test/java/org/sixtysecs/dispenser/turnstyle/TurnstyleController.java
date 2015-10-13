@@ -2,40 +2,33 @@ package org.sixtysecs.dispenser.turnstyle;
 
 import com.sun.corba.se.impl.orbutil.threadpool.TimeoutException;
 
-import java.util.*;
+import java.util.EnumSet;
 import java.util.concurrent.*;
 
 /**
- * Created by edriggs on 10/11/15.
+ * Created by edriggs on 10/12/15.
  */
-public class TurnstyleLaneEvent {
+public class TurnstyleController {
 
     static long waitTimeMillis = 10;
-    static ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleLaneEvent>> laneEventMap =
-            new ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleLaneEvent>>();
+
+
+    static ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleEvent>> laneEventMap =
+            new ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleEvent>>();
 
     static {
         initEvents();
     }
 
-    Date firedOn = new Date();
-    TurnstyleLane turnstyleLane;
-
-    private TurnstyleLaneEvent(TurnstyleLane turnstyleLane) {
-        this.turnstyleLane = turnstyleLane;
-    }
-
-
-
     static synchronized void initEvents() {
 
 
         if (laneEventMap == null) {
-            laneEventMap = new ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleLaneEvent>>();
+            laneEventMap = new ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleEvent>>();
         }
         for (TurnstyleLane lane : EnumSet.allOf(TurnstyleLane.class)) {
             if (laneEventMap.get(lane) == null) {
-                laneEventMap.put(lane, new ConcurrentLinkedQueue<TurnstyleLaneEvent>());
+                laneEventMap.put(lane, new ConcurrentLinkedQueue<TurnstyleEvent>());
             }
             else {
                 while (laneEventMap.get(lane).poll() != null);
@@ -44,13 +37,14 @@ public class TurnstyleLaneEvent {
     }
 
     static synchronized void fireLaneEvent(TurnstyleLane lane) {
-        TurnstyleLaneEvent event = new TurnstyleLaneEvent(lane);
+        TurnstyleEvent event = new TurnstyleEvent(lane);
         laneEventMap.get(lane)
                 .add(event);
     }
 
-    public static TurnstyleLaneEvent waitForEvent(TurnstyleLane lane, long timeout) throws TimeoutException {
-        TurnstyleLaneEvent turnstyleLaneEvent = null;
+
+    public static TurnstyleEvent waitForEvent(TurnstyleLane lane, long timeout) throws TimeoutException {
+        TurnstyleEvent turnstyleLaneEvent = null;
         int totalWaitTimeMillis = 0;
         do {
             turnstyleLaneEvent = laneEventMap.get(lane)
@@ -73,15 +67,7 @@ public class TurnstyleLaneEvent {
         return turnstyleLaneEvent;
     }
 
-    public Date getFiredOn() {
-        return firedOn;
-    }
-
-    public TurnstyleLane getTurnstyleLane() {
-        return turnstyleLane;
-    }
-
-    public static class WaitForCallable implements Callable<TurnstyleLaneEvent> {
+    public static class WaitForCallable implements Callable<TurnstyleEvent> {
 
         private TurnstyleLane turnstyleLane;
         private long timeout;
@@ -97,8 +83,8 @@ public class TurnstyleLaneEvent {
             return isSuccess;
         }
 
-        public TurnstyleLaneEvent call() throws Exception {
-            TurnstyleLaneEvent event =  TurnstyleLaneEvent.waitForEvent(turnstyleLane, timeout);
+        public TurnstyleEvent call() throws Exception {
+            TurnstyleEvent event =  TurnstyleController.waitForEvent(turnstyleLane, timeout);
             if (event != null) {
                 isSuccess = true;
             }
@@ -119,8 +105,9 @@ public class TurnstyleLaneEvent {
         }
 
         public void run() {
-            TurnstyleLaneEvent.fireLaneEvent(turnstyleLane);
+            TurnstyleController.fireLaneEvent(turnstyleLane);
             isSuccess = true;
         }
     }
+
 }
