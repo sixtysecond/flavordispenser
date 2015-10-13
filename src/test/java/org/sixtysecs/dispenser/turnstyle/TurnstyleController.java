@@ -10,17 +10,19 @@ import java.util.concurrent.*;
  */
 public class TurnstyleController {
 
-    static long waitTimeMillis = 10;
+    long waitTimeMillis;
 
 
-    static ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleEvent>> laneEventMap =
+    ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleEvent>> laneEventMap =
             new ConcurrentHashMap<TurnstyleLane, ConcurrentLinkedQueue<TurnstyleEvent>>();
 
-    static {
+    public TurnstyleController( long waitTimeMillis) {
+
+        this.waitTimeMillis = waitTimeMillis;
         initEvents();
     }
 
-    static synchronized void initEvents() {
+    synchronized void initEvents() {
 
 
         if (laneEventMap == null) {
@@ -36,14 +38,14 @@ public class TurnstyleController {
         }
     }
 
-    static synchronized void fireLaneEvent(TurnstyleLane lane) {
+    synchronized void fireLaneEvent(TurnstyleLane lane) {
         TurnstyleEvent event = new TurnstyleEvent(lane);
         laneEventMap.get(lane)
                 .add(event);
     }
 
 
-    public static TurnstyleEvent waitForEvent(TurnstyleLane lane, long timeout) throws TimeoutException {
+    public TurnstyleEvent waitForEvent(TurnstyleLane lane, long timeout) throws TimeoutException {
         TurnstyleEvent turnstyleLaneEvent = null;
         int totalWaitTimeMillis = 0;
         do {
@@ -70,11 +72,13 @@ public class TurnstyleController {
     public static class WaitForCallable implements Callable<TurnstyleEvent> {
 
         private TurnstyleLane turnstyleLane;
+        private TurnstyleController turnstyleController;
         private long timeout;
         private boolean isSuccess = false;
 
-        public WaitForCallable(TurnstyleLane turnstyleLane, long timeout) {
+        public WaitForCallable(TurnstyleLane turnstyleLane, TurnstyleController turnstyleController, long timeout) {
             this.turnstyleLane = turnstyleLane;
+            this.turnstyleController = turnstyleController;
             this.timeout = timeout;
         }
 
@@ -84,7 +88,7 @@ public class TurnstyleController {
         }
 
         public TurnstyleEvent call() throws Exception {
-            TurnstyleEvent event =  TurnstyleController.waitForEvent(turnstyleLane, timeout);
+            TurnstyleEvent event =  turnstyleController.waitForEvent(turnstyleLane, timeout);
             if (event != null) {
                 isSuccess = true;
             }
@@ -99,13 +103,15 @@ public class TurnstyleController {
         }
 
         private TurnstyleLane turnstyleLane;
+        private TurnstyleController turnstyleController;
 
-        public FireEventCallable(TurnstyleLane turnstyleLane) {
+        public FireEventCallable(TurnstyleLane turnstyleLane, TurnstyleController turnstyleController) {
             this.turnstyleLane = turnstyleLane;
+            this.turnstyleController = turnstyleController;
         }
 
         public void run() {
-            TurnstyleController.fireLaneEvent(turnstyleLane);
+            turnstyleController.fireLaneEvent(turnstyleLane);
             isSuccess = true;
         }
     }
