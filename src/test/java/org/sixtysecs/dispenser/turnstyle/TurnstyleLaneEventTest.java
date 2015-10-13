@@ -34,9 +34,9 @@ public class TurnstyleLaneEventTest {
         TurnstyleController turnstyleController = new TurnstyleController();
         final TurnstileLane lane = TurnstileLane.ONE;
 
-        TurnstyleController.WaitForTurnstyleEventCallable waitForCallable =
-                new TurnstyleController.WaitForTurnstyleEventCallable(lane, turnstyleController, 100);
-        TurnstyleController.FireTurnstyleEventRunnable fireEventCallable = new TurnstyleController.FireTurnstyleEventRunnable(lane, turnstyleController);
+        WaitForTurnstyleEventCallable waitForCallable =
+                new WaitForTurnstyleEventCallable(lane, turnstyleController, 100);
+        FireTurnstyleEventRunnable fireEventCallable = new FireTurnstyleEventRunnable(lane, turnstyleController);
         ExecutorService executor = Executors.newFixedThreadPool(2);
         executor.submit(waitForCallable);
 
@@ -55,8 +55,8 @@ public class TurnstyleLaneEventTest {
         TurnstyleController turnstyleController = new TurnstyleController();
         final TurnstileLane lane = TurnstileLane.ONE;
 
-        TurnstyleController.WaitForTurnstyleEventCallable waitForCallable = new TurnstyleController.WaitForTurnstyleEventCallable(lane, turnstyleController, 100);
-        TurnstyleController.FireTurnstyleEventRunnable fireEventCallable = new TurnstyleController.FireTurnstyleEventRunnable(lane, turnstyleController);
+        WaitForTurnstyleEventCallable waitForCallable = new WaitForTurnstyleEventCallable(lane, turnstyleController, 100);
+        FireTurnstyleEventRunnable fireEventCallable = new FireTurnstyleEventRunnable(lane, turnstyleController);
         ExecutorService executor = Executors.newFixedThreadPool(2);
         executor.submit(waitForCallable);
 

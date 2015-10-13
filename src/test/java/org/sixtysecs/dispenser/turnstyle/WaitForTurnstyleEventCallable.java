@@ -1,9 +1,11 @@
 package org.sixtysecs.dispenser.turnstyle;
 
+import java.util.concurrent.Callable;
+
 /**
  * Created by edriggs on 10/12/15.
  */
-public class WaitForTurnstyleEventCallable {
+public class WaitForTurnstyleEventCallable implements Callable {
     private TurnstileLane turnstyleLane;
     private TurnstyleController turnstyleController;
     private long timeout;
