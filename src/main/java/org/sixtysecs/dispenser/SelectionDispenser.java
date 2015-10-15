@@ -3,24 +3,22 @@ package org.sixtysecs.dispenser;
 import java.util.*;
 
 /**
- * Dispenses objects of a single type whose properties are determined by the selection made.
- * A vending machine for objects.
+ * Dispenses objects which share a type. Maintains an inventory of objects for each selection type,
+ * and allows dispensing and adding inventory for each selection.
  *
  * @param <T> the type dispensed
- * @param <E> an enumeration of selections. The selection determines the properties of
- *            the object dispensed and an inventory exists for each selection.
+ * @param <E> a selection determining which inventory to dispense from. Enums are recommended.
  * @author edriggs
  */
-public interface SelectionDispenser<T, E extends Enum<E>> {
+public interface SelectionDispenser<T, E> {
 
     /**
-     * @return the set of enumerated selections the dispenser supports
+     * @return the set of selections the dispenser offers
      */
     public Set<E> getSelections();
 
     /**
-     * @param selection an enumerated member which has its own inventory and determines the properties of the dispensed item.
-     *                  Similar to a product button on a vending machine.
+     * @param selection Determines which inventory to dispense from. Similar to a product button on a vending machine.
      * @return an instance of T, or null if unable to dispense.
      */
     public T dispense(E selection);

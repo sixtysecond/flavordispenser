@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
-public class AbstractSelectionDispenser<T, E extends Enum<E>>
+public class AbstractSelectionDispenser<T, E>
         implements SelectionDispenser<T, E> {
 
     Map<E, Queue<T>> inventory = new ConcurrentHashMap<E, Queue<T>>();
@@ -56,6 +56,10 @@ public class AbstractSelectionDispenser<T, E extends Enum<E>>
     }
 
     public Set<E> getSelections() {
-        return EnumSet.allOf(tClass);
+        Set<E> selections = new HashSet<E>();
+        for ( E selection : inventory.keySet()) {
+            selections.add(selection);
+        }
+        return selections;
     }
 }
