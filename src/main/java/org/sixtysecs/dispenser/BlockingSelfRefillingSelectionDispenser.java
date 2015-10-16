@@ -10,14 +10,15 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @param <T>
  * @param <E>
  */
-public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelfRefillingSelectionDispenser<T, E> {
+public class BlockingSelfRefillingSelectionDispenser<T, E> extends AbstractSelfRefillingSelectionDispenser<T, E> {
 
 
-    public SelfRefillingSelectionDispenser(SelectionFactory<T, E> selectionFactory,
-                                           Map<E, Integer> desiredInventory) {
+    public BlockingSelfRefillingSelectionDispenser(SelectionFactory<T, E> selectionFactory,
+                                                   Map<E, Integer> desiredInventory) {
         super(selectionFactory, desiredInventory);
     }
 
+    @Override
     public void refillInventory() {
         for (E selection : getSelections()) {
             refillSelection(selection);
@@ -27,7 +28,7 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelfRefilling
     public void refillSelection(E selection) {
         synchronized (selection) {
             final int inventoryCount = getSelectionInventoryCount(selection);
-            Integer desiredCount = desiredInventory.get(selection);
+            Integer desiredCount = getDesiredInventory().get(selection);
             if (desiredCount == null) {
                 desiredCount = 0;
             }

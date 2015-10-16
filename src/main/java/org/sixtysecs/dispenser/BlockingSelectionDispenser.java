@@ -7,7 +7,7 @@ import java.util.Queue;
  *
  * @see SelectionDispenser
  */
-public class ConcurrentSelectionDispenser<T, E> extends AbstractSelectionDispenser<T, E> {
+public class BlockingSelectionDispenser<T, E> extends AbstractSelectionDispenser<T, E> {
 
     public T dispense(E selection) {
         Queue<T> queue = inventory.get(selection);

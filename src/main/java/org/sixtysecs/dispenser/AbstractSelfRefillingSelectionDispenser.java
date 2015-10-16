@@ -8,16 +8,27 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class AbstractSelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDispenser<T, E> {
     protected SelectionFactory<T, E> selectionFactory;
-    protected Map<E, Integer> desiredInventory;
+    private Map<E, Integer> desiredInventory;
+
+    protected AbstractSelfRefillingSelectionDispenser() {
+    }
 
     public AbstractSelfRefillingSelectionDispenser(SelectionFactory<T, E> selectionFactory,
                                                    Map<E, Integer> desiredInventory) {
         this.selectionFactory = selectionFactory;
+        setDesiredInventory(desiredInventory);
+        refillInventory();
+    }
+
+    protected void setDesiredInventory(Map<E, Integer> desiredInventory) {
         if (desiredInventory == null) {
             desiredInventory = new ConcurrentHashMap<E, Integer>();
         }
         this.desiredInventory = desiredInventory;
-        refillInventory();
+    }
+
+    protected Map<E, Integer> getDesiredInventory() {
+        return desiredInventory;
     }
 
     @Override

@@ -6,7 +6,7 @@ import java.util.concurrent.*;
 /**
  * Created by edriggs on 10/11/15.
  */
-public class ConcurrentSelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDispenser<T, E> {
+public class ConcurrentSelfRefillingSelectionDispenser<T, E> extends AbstractSelfRefillingSelectionDispenser<T, E> {
 
     protected ExecutorService executorService;
     protected SelectionFactory<T, E> selectionFactory;
@@ -15,9 +15,13 @@ public class ConcurrentSelfRefillingSelectionDispenser<T, E> extends AbstractSel
 
     public ConcurrentSelfRefillingSelectionDispenser(SelectionFactory<T, E> selectionFactory, Map<E, Integer> desiredInventory,
                                                      int nThreads) {
-        executorService = Executors.newFixedThreadPool(nThreads);
         this.selectionFactory = selectionFactory;
-        this.desiredInventory = desiredInventory;
+        setDesiredInventory(desiredInventory);
+        executorService = Executors.newFixedThreadPool(nThreads);
+        refillInventory();
+    }
+
+    public void refillInventory() {
         for (E selection : desiredInventory.keySet()) {
             executorService.submit(new RefillRunnable(selection));
         }
