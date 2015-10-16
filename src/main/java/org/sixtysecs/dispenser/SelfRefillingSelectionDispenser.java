@@ -15,23 +15,25 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
     protected SelectionFactory<T, E> selectionFactory;
     protected Map<E, Integer> desiredInventory;
 
-    public SelfRefillingSelectionDispenser( SelectionFactory<T, E> selectionFactory, Map<E, Integer> desiredInventory) {
+    public SelfRefillingSelectionDispenser(SelectionFactory<T, E> selectionFactory, Map<E, Integer> desiredInventory) {
         this.selectionFactory = selectionFactory;
-        this.desiredInventory = sanitizeDesiredInventory(desiredInventory);
-        refillInventory();
-    }
-
-    public Map<E, Integer> sanitizeDesiredInventory(Map<E, Integer> desiredInventory) {
         if (desiredInventory == null) {
             desiredInventory = new ConcurrentHashMap<E, Integer>();
         }
-        for (E selection : getSelections()) {
-            Integer desiredSelectionCount = desiredInventory.get(selection);
-            if (desiredSelectionCount == null) {
-                desiredInventory.put(selection, 1);
-            }
+        this.desiredInventory = desiredInventory;
+        refillInventory();
+    }
+
+    @Override
+    public Set<E> getSelections() {
+        Set<E> selections = new HashSet<E>();
+        for (E selection : inventory.keySet()) {
+            selections.add(selection);
         }
-        return desiredInventory;
+        for (E selection : desiredInventory.keySet()) {
+            selections.add(selection);
+        }
+        return selections;
     }
 
     public void refillInventory() {
@@ -43,14 +45,16 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
 
     public void refillSelection(E selection) {
         synchronized (selection) {
-            Queue<T> queue = inventory.get(selection);
-            final int actualCount = queue.size();
-            final int desiredCount = desiredInventory.get(selection);
-            final int diff = desiredCount - actualCount;
-            Map<E,Integer> order = new ConcurrentHashMap<E, Integer>();
+            final int inventoryCount = getSelectionInventoryCount(selection);
+            Integer desiredCount = desiredInventory.get(selection);
+            if (desiredCount == null) {
+                desiredCount = 0;
+            }
+            final int diff = desiredCount - inventoryCount;
+            Map<E, Integer> order = new ConcurrentHashMap<E, Integer>();
             order.put(selection, diff);
             if (diff > 0) {
-                addInventory( selectionFactory.fulfill(order));
+                addInventory(selectionFactory.fulfill(order));
             }
         }
     }
@@ -59,8 +63,18 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
     public T dispense(E selection) {
         synchronized (selection) {
             refillSelection(selection);
-            T t = inventory.get(selection)
-                    .poll();
+            Queue<T> inventorySelection = inventory.get(selection);
+            if (inventorySelection == null) {
+                inventory.put(selection, new ConcurrentLinkedQueue<T>());
+                inventorySelection = inventory.get(selection);
+            }
+
+            T t = inventorySelection.poll();
+            if (t == null) {
+                Map<E, Integer> order = new ConcurrentHashMap<E, Integer>();
+                order.put(selection, 1);
+                Map<E, Collection<T>> newInventory = selectionFactory.fulfill(order);
+            }
             refillSelection(selection);
             return t;
         }
@@ -68,14 +82,17 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
 
     @Override
     public void addInventory(Map<E, Collection<T>> newInventory) {
-        synchronized (this) {
+
             for (Map.Entry<E, Collection<T>> entry : newInventory.entrySet()) {
-                Queue<T> selectionInventory = inventory.get(entry.getKey());
-                if (selectionInventory == null) {
-                    newInventory.put(entry.getKey(), new ConcurrentLinkedQueue<T>());
+                synchronized(entry.getKey()) {
+                    Queue<T> selectionInventory = inventory.get(entry.getKey());
+                    if (selectionInventory == null) {
+                        inventory.put(entry.getKey(), new ConcurrentLinkedQueue<T>());
+                    }
+                    inventory.get(entry.getKey())
+                            .addAll(entry.getValue());
                 }
-                selectionInventory.addAll(entry.getValue());
             }
-        }
+
     }
 }

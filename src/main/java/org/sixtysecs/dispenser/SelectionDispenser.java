@@ -17,10 +17,15 @@ public interface SelectionDispenser<T, E> {
      */
     public Set<E> getSelections();
 
+//    /**
+//     * @return the current inventory count for each selection
+//     */
+//    public Map<E, Integer> getInventoryCount();
+
     /**
      * @return the current inventory count for each selection
      */
-    public Map<E, Integer> getInventoryCount();
+    public int getSelectionInventoryCount(E selection);
 
 
     /**
@@ -29,7 +34,7 @@ public interface SelectionDispenser<T, E> {
      */
     public T dispense(E selection);
 
-    
+
     /**
      * @param newInventory adds the new inventory to the existing inventory.
      *                     for each E in the map, adds the collection of T to that selection's inventory

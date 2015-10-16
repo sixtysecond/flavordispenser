@@ -1,6 +1,6 @@
 package org.sixtysecs.dispenser;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 import org.sixtysecs.dispenser.crayon.Crayon;
 import org.sixtysecs.dispenser.crayon.CrayonColor;
 import org.testng.Assert;
@@ -12,18 +12,16 @@ import java.util.*;
  */
 public class SimpleSelectionDispenserTest {
 
-    Integer ZERO = new Integer(0);
-    Integer ONE = new Integer(1);
-
     public ConcurrentSelectionDispenser<Crayon, CrayonColor> getCrayonDispenser() {
         return new ConcurrentSelectionDispenser<Crayon, CrayonColor>();
     }
 
     @Test
-    public void emptyAfterCreateTest() {
+    public void selectionInventoryCountZeroAfterCreateTest() {
         ConcurrentSelectionDispenser<Crayon, CrayonColor> dispenser = getCrayonDispenser();
-        Assert.assertEquals(dispenser.getInventoryCount()
-                .get(CrayonColor.BLUE), ZERO);
+        for ( CrayonColor crayonColor : EnumSet.allOf(CrayonColor.class)) {
+            Assert.assertEquals(dispenser.getSelectionInventoryCount(crayonColor), 0);
+        }
     }
 
     @Test
@@ -32,8 +30,7 @@ public class SimpleSelectionDispenserTest {
         Map<CrayonColor, Collection<Crayon>> newInventory = new HashMap<CrayonColor, Collection<Crayon>>();
         newInventory.put(CrayonColor.BLUE, Arrays.asList(new Crayon(CrayonColor.BLUE)));
         dispenser.addInventory(newInventory);
-        Assert.assertEquals(dispenser.getInventoryCount()
-                .get(CrayonColor.BLUE), ONE);
+        Assert.assertEquals(dispenser.getSelectionInventoryCount(CrayonColor.BLUE), 1);
     }
 
     @Test
@@ -45,7 +42,6 @@ public class SimpleSelectionDispenserTest {
         Crayon crayon = dispenser.dispense(CrayonColor.BLUE);
         Assert.assertNotNull(crayon);
         Assert.assertEquals(crayon.getCrayonColor(), CrayonColor.BLUE);
-        Assert.assertEquals(dispenser.getInventoryCount()
-                .get(CrayonColor.BLUE), ZERO);
+        Assert.assertEquals(dispenser.getSelectionInventoryCount(CrayonColor.BLUE), 0);
     }
 }

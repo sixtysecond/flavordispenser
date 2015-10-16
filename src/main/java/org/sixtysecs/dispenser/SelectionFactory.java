@@ -17,4 +17,6 @@ public interface SelectionFactory<T, E> {
      * @return a sparse map containing the T which were instantiated, grouped by selection E
      */
     public Map<E, Collection<T>> fulfill(Map<E, Integer> order);
+
+    public T createItem(E selection);
 }

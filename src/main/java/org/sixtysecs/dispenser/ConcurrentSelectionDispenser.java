@@ -1,7 +1,6 @@
 package org.sixtysecs.dispenser;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -10,8 +9,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @see SelectionDispenser
  */
 public class ConcurrentSelectionDispenser<T, E> extends AbstractSelectionDispenser<T, E> {
-    Map<E, Queue<T>> inventory = new ConcurrentHashMap<E, Queue<T>>();
-
 
     public T dispense(E selection) {
         Queue<T> queue = inventory.get(selection);
@@ -26,9 +23,9 @@ public class ConcurrentSelectionDispenser<T, E> extends AbstractSelectionDispens
             for (Map.Entry<E, Collection<T>> entry : newInventory.entrySet()) {
                 Queue<T> selectionInventory = inventory.get(entry.getKey());
                 if (selectionInventory == null) {
-                    newInventory.put(entry.getKey(), new ConcurrentLinkedQueue<T>());
+                    inventory.put(entry.getKey(), new ConcurrentLinkedQueue<T>());
                 }
-                selectionInventory.addAll(entry.getValue());
+                inventory.get(entry.getKey()).addAll(entry.getValue());
             }
         }
     }
