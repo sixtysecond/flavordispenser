@@ -4,12 +4,12 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * A factory for creating objects of type T whose properties are determined by E.
+ * A factory for creating items to add to a SelectionDispenser's inventory.
  *
  * @param <T> the type of all objects instantiated
- * @param <E> an enumeration of selections deterining the properties of the instantiated object.
+ * @param <E> which selection the objects should be added to. Enums are recommended.
  */
-public interface SelectionFactory<T, E extends Enum<E>> {
+public interface SelectionFactory<T, E> {
 
     /**
      * Fulfills an order for new inventory of objets

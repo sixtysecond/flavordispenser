@@ -1,15 +1,20 @@
 package org.sixtysecs.dispenser;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
  * Created by edriggs on 10/11/15.
  */
-public class ConcurrentSelfRefillingSelectionDispenser<T,E extends Enum<E>>  extends SelfRefillingSelectionDispenser<T,E>{
+public class ConcurrentSelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDispenser<T, E> {
 
+    @Override
+    public T dispense(E selection) {
+        return null;
+    }
 
-    public ConcurrentSelfRefillingSelectionDispenser(Class tClass, SelectionFactory<T, E> selectionFactory,
-                                                     Map<E, Integer> desiredInventory) {
-        super(tClass, selectionFactory, desiredInventory);
+    @Override
+    public void addInventory(Map<E, Collection<T>> newInventory) {
+
     }
 }

@@ -2,6 +2,7 @@ package org.sixtysecs.dispenser;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * A thread-safe dispenser which refills its inventory on instantiation and after dispensing a selection.
@@ -9,13 +10,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * @param <T>
  * @param <E>
  */
-public class SelfRefillingSelectionDispenser<T, E extends Enum<E>> extends AbstractSelectionDispenser<T, E> {
+public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDispenser<T, E> {
 
     protected SelectionFactory<T, E> selectionFactory;
     protected Map<E, Integer> desiredInventory;
 
-    public SelfRefillingSelectionDispenser(Class tClass, SelectionFactory<T, E> selectionFactory, Map<E, Integer> desiredInventory) {
-        super(tClass);
+    public SelfRefillingSelectionDispenser( SelectionFactory<T, E> selectionFactory, Map<E, Integer> desiredInventory) {
         this.selectionFactory = selectionFactory;
         this.desiredInventory = sanitizeDesiredInventory(desiredInventory);
         refillInventory();
@@ -40,6 +40,7 @@ public class SelfRefillingSelectionDispenser<T, E extends Enum<E>> extends Abstr
         }
     }
 
+
     public void refillSelection(E selection) {
         synchronized (selection) {
             Queue<T> queue = inventory.get(selection);
@@ -54,6 +55,7 @@ public class SelfRefillingSelectionDispenser<T, E extends Enum<E>> extends Abstr
         }
     }
 
+    @Override
     public T dispense(E selection) {
         synchronized (selection) {
             refillSelection(selection);
@@ -61,6 +63,19 @@ public class SelfRefillingSelectionDispenser<T, E extends Enum<E>> extends Abstr
                     .poll();
             refillSelection(selection);
             return t;
+        }
+    }
+
+    @Override
+    public void addInventory(Map<E, Collection<T>> newInventory) {
+        synchronized (this) {
+            for (Map.Entry<E, Collection<T>> entry : newInventory.entrySet()) {
+                Queue<T> selectionInventory = inventory.get(entry.getKey());
+                if (selectionInventory == null) {
+                    newInventory.put(entry.getKey(), new ConcurrentLinkedQueue<T>());
+                }
+                selectionInventory.addAll(entry.getValue());
+            }
         }
     }
 }
