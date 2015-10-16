@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * A thread-safe dispenser which refills its inventory on instantiation and after dispensing a selection.
+ * A thread-safe, blocking dispenser which refills its inventory on instantiation and after dispensing a selection.
  *
  * @param <T>
  * @param <E>
