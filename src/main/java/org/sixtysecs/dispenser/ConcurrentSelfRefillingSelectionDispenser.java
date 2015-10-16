@@ -24,14 +24,6 @@ public class ConcurrentSelfRefillingSelectionDispenser<T, E> extends AbstractSel
     }
 
     @Override
-    public void addInventory(Map<E, Collection<T>> newInventory) {
-        for (Map.Entry<E, Collection<T>> entry : newInventory.entrySet()) {
-            executorService.submit(new AddSelectionInventoryRunnable(entry.getKey(), entry.getValue()));
-        }
-    }
-
-
-    @Override
     public T dispense(E selection) {
         T t = inventory.get(selection)
                 .poll();
@@ -73,30 +65,6 @@ public class ConcurrentSelfRefillingSelectionDispenser<T, E> extends AbstractSel
                     addInventory(selectionFactory.fulfill(order));
                 }
             }
-        }
-    }
-
-    private class AddSelectionInventoryRunnable implements Runnable {
-
-        private E selection;
-        private Collection<T> newInventory;
-
-        AddSelectionInventoryRunnable(E selection, Collection<T> newInventory) {
-            this.selection = selection;
-            this.newInventory = newInventory;
-        }
-
-        public void run() {
-            if (inventory.get(selection) == null) {
-                synchronized (selection) {
-                    if (inventory.get(selection) == null) {
-                        inventory.put(selection, new ConcurrentLinkedDeque<T>());
-                    }
-                }
-            }
-
-            inventory.get(selection)
-                    .addAll(newInventory);
         }
     }
 }

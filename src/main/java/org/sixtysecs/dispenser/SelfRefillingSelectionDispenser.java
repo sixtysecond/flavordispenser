@@ -10,30 +10,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @param <T>
  * @param <E>
  */
-public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDispenser<T, E> {
+public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelfRefillingSelectionDispenser<T, E> {
 
-    protected SelectionFactory<T, E> selectionFactory;
-    protected Map<E, Integer> desiredInventory;
 
-    public SelfRefillingSelectionDispenser(SelectionFactory<T, E> selectionFactory, Map<E, Integer> desiredInventory) {
-        this.selectionFactory = selectionFactory;
-        if (desiredInventory == null) {
-            desiredInventory = new ConcurrentHashMap<E, Integer>();
-        }
-        this.desiredInventory = desiredInventory;
-        refillInventory();
-    }
-
-    @Override
-    public Set<E> getSelections() {
-        Set<E> selections = new HashSet<E>();
-        for (E selection : inventory.keySet()) {
-            selections.add(selection);
-        }
-        for (E selection : desiredInventory.keySet()) {
-            selections.add(selection);
-        }
-        return selections;
+    public SelfRefillingSelectionDispenser(SelectionFactory<T, E> selectionFactory,
+                                           Map<E, Integer> desiredInventory) {
+        super(selectionFactory, desiredInventory);
     }
 
     public void refillInventory() {
@@ -41,7 +23,6 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
             refillSelection(selection);
         }
     }
-
 
     public void refillSelection(E selection) {
         synchronized (selection) {
@@ -80,19 +61,5 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
         }
     }
 
-    @Override
-    public void addInventory(Map<E, Collection<T>> newInventory) {
 
-            for (Map.Entry<E, Collection<T>> entry : newInventory.entrySet()) {
-                synchronized(entry.getKey()) {
-                    Queue<T> selectionInventory = inventory.get(entry.getKey());
-                    if (selectionInventory == null) {
-                        inventory.put(entry.getKey(), new ConcurrentLinkedQueue<T>());
-                    }
-                    inventory.get(entry.getKey())
-                            .addAll(entry.getValue());
-                }
-            }
-
-    }
 }
