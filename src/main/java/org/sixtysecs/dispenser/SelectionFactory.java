@@ -18,5 +18,10 @@ public interface SelectionFactory<T, E> {
      */
     public Map<E, Collection<T>> fulfill(Map<E, Integer> order);
 
+    /**
+     * Creates a single item
+     * @param selection the selection to create the item for
+     * @return an instance of T for use in selection E
+     */
     public T createItem(E selection);
 }

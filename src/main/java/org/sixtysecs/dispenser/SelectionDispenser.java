@@ -17,11 +17,6 @@ public interface SelectionDispenser<T, E> {
      */
     public Set<E> getSelections();
 
-//    /**
-//     * @return the current inventory count for each selection
-//     */
-//    public Map<E, Integer> getInventoryCount();
-
     /**
      * @return the current inventory count for each selection
      */

@@ -12,13 +12,13 @@ import java.util.*;
  */
 public class SimpleSelectionDispenserTest {
 
-    public BlockingSelectionDispenser<Crayon, CrayonColor> getCrayonDispenser() {
-        return new BlockingSelectionDispenser<Crayon, CrayonColor>();
+    public SimpleSelectionDispenser<Crayon, CrayonColor> getCrayonDispenser() {
+        return new SimpleSelectionDispenser<Crayon, CrayonColor>();
     }
 
     @Test
     public void selectionInventoryCountZeroAfterCreateTest() {
-        BlockingSelectionDispenser<Crayon, CrayonColor> dispenser = getCrayonDispenser();
+        SimpleSelectionDispenser<Crayon, CrayonColor> dispenser = getCrayonDispenser();
         for ( CrayonColor crayonColor : EnumSet.allOf(CrayonColor.class)) {
             Assert.assertEquals(dispenser.getSelectionInventoryCount(crayonColor), 0);
         }
@@ -26,7 +26,7 @@ public class SimpleSelectionDispenserTest {
 
     @Test
     public void hasItemsAfterRefillTest() {
-        BlockingSelectionDispenser<Crayon, CrayonColor> dispenser = getCrayonDispenser();
+        SimpleSelectionDispenser<Crayon, CrayonColor> dispenser = getCrayonDispenser();
         Map<CrayonColor, Collection<Crayon>> newInventory = new HashMap<CrayonColor, Collection<Crayon>>();
         newInventory.put(CrayonColor.BLUE, Arrays.asList(new Crayon(CrayonColor.BLUE)));
         dispenser.addInventory(newInventory);
@@ -35,7 +35,7 @@ public class SimpleSelectionDispenserTest {
 
     @Test
     public void inventoryDecreasesAfterDispenseTest() {
-        BlockingSelectionDispenser<Crayon, CrayonColor> dispenser = getCrayonDispenser();
+        SimpleSelectionDispenser<Crayon, CrayonColor> dispenser = getCrayonDispenser();
         Map<CrayonColor, Collection<Crayon>> newInventory = new HashMap<CrayonColor, Collection<Crayon>>();
         newInventory.put(CrayonColor.BLUE, Arrays.asList(new Crayon(CrayonColor.BLUE)));
         dispenser.addInventory(newInventory);

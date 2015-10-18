@@ -4,8 +4,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractSelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDispenser<T, E> {
-    protected SelectionFactory<T, E> selectionFactory;
-    private Map<E, Integer> desiredInventory = new ConcurrentHashMap<E, Integer>();
+    protected final SelectionFactory<T, E> selectionFactory;
+    protected volatile Map<E, Integer> desiredInventory = new ConcurrentHashMap<E, Integer>();
 
     private AbstractSelfRefillingSelectionDispenser() {
         throw new UnsupportedOperationException("selectionFactory must be set in constructor");
@@ -45,6 +45,58 @@ public abstract class AbstractSelfRefillingSelectionDispenser<T, E> extends Abst
         return selections;
     }
 
-    public abstract void refillInventory();
 
+
+    @Override
+    public T dispense(E selection) {
+
+        initSelectionQueue(selection);
+
+        T t = inventory.get(selection)
+                .poll();
+        if (t == null) {
+            t = selectionFactory.createItem(selection);
+        }
+        refillSelection(selection);
+        return t;
+    }
+
+    public void refillInventory() {
+        for (E selection : getSelections()) {
+            refillSelection(selection);
+        }
+    }
+
+    public void refillSelection(E selection) {
+        new RefillRunnable(selection).run();
+    }
+
+    protected class RefillRunnable implements Runnable {
+        E selection;
+
+        RefillRunnable(E selection) {
+            this.selection = selection;
+        }
+
+        public void run() {
+            initSelectionQueue(selection);
+            synchronized (selection) {
+                Queue<T> queue = inventory.get(selection);
+                final int actualCount = queue.size();
+                Integer desiredCount = desiredInventory.get(selection);
+                if (desiredCount == null) {
+                    desiredCount = 0;
+                }
+                final int diff = desiredCount - actualCount;
+
+                /*Use order size of 1 since inventory is only
+                available after entire order has been fulfilled*/
+                for (int i = 0; i < diff; i++) {
+                    Map<E, Integer> order = new ConcurrentHashMap<E, Integer>();
+                    order.put(selection, 1);
+                    addInventory(selectionFactory.fulfill(order));
+                }
+            }
+        }
+    }
 }
