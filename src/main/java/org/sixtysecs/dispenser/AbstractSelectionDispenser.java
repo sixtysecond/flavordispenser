@@ -11,6 +11,26 @@ public abstract class AbstractSelectionDispenser<T, E> implements SelectionDispe
 
     final Map<E, Queue<T>> inventory = new ConcurrentHashMap<E, Queue<T>>();
 
+    /**
+     * Ensure that an inventory collection exists for each E in newInventory
+     *
+     * @param selection the selection
+     */
+    protected void initSelectionInventory(E selection) {
+
+        if (inventory.get(selection) != null) {
+            return;
+        }
+
+        synchronized (selection) {
+            if (inventory.get(selection) == null) {
+                inventory.put(selection, new ConcurrentLinkedQueue<T>());
+            }
+        }
+
+    }
+
+
     public Set<E> getSelections() {
         Set<E> selections = new HashSet<E>();
         for (E selection : inventory.keySet()) {
@@ -36,16 +56,7 @@ public abstract class AbstractSelectionDispenser<T, E> implements SelectionDispe
          * Ensure that an inventory collection exists for each E in newInventory
          */
         for (Map.Entry<E, Collection<T>> entry : newInventory.entrySet()) {
-            if (inventory.get(entry.getKey()) == null) {
-                /**
-                 * Prevent race condition on initialization of selection inventory
-                 */
-                synchronized (entry.getKey()) {
-                    if (inventory.get(entry.getKey()) == null) {
-                        inventory.put(entry.getKey(), new ConcurrentLinkedQueue<T>());
-                    }
-                }
-            }
+            initSelectionInventory(entry.getKey());
         }
         for (Map.Entry<E, Collection<T>> entry : newInventory.entrySet()) {
             if (!CollectionUtils.isEmpty(entry.getValue())) {
@@ -55,20 +66,5 @@ public abstract class AbstractSelectionDispenser<T, E> implements SelectionDispe
         }
     }
 
-    /**
-     * Prevent race condition on initialization of selection inventory
-     */
-    protected void initSelectionQueue(E selection) {
 
-        if (inventory.get(selection) != null) {
-            return;
-        }
-
-        synchronized (selection) {
-            if (inventory.get(selection) == null) {
-                inventory.put(selection, new ConcurrentLinkedQueue<T>());
-            }
-        }
-
-    }
 }

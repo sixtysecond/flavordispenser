@@ -1,17 +1,18 @@
 package org.sixtysecs.dispenser;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
-public abstract class AbstractSelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDispenser<T, E> {
+public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDispenser<T, E> {
     protected final SelectionFactory<T, E> selectionFactory;
     protected volatile Map<E, Integer> desiredInventory = new ConcurrentHashMap<E, Integer>();
+    protected ExecutorService executorService = Executors.newCachedThreadPool();
 
-    private AbstractSelfRefillingSelectionDispenser() {
+    private SelfRefillingSelectionDispenser() {
         throw new UnsupportedOperationException("selectionFactory must be set in constructor");
     }
 
-    public AbstractSelfRefillingSelectionDispenser(SelectionFactory<T, E> selectionFactory) {
+    public SelfRefillingSelectionDispenser(SelectionFactory<T, E> selectionFactory) {
         this.selectionFactory = selectionFactory;
     }
 
@@ -24,7 +25,7 @@ public abstract class AbstractSelfRefillingSelectionDispenser<T, E> extends Abst
      *
      * @param desiredInventory
      */
-    protected AbstractSelfRefillingSelectionDispenser setDesiredInventory(Map<E, Integer> desiredInventory) {
+    protected SelfRefillingSelectionDispenser setDesiredInventory(Map<E, Integer> desiredInventory) {
         if (desiredInventory == null) {
             desiredInventory = new ConcurrentHashMap<E, Integer>();
         }
@@ -35,23 +36,17 @@ public abstract class AbstractSelfRefillingSelectionDispenser<T, E> extends Abst
 
     @Override
     public Set<E> getSelections() {
-        Set<E> selections = new HashSet<E>();
-        for (E selection : inventory.keySet()) {
-            selections.add(selection);
-        }
+        Set<E> selections = super.getSelections();
         for (E selection : desiredInventory.keySet()) {
             selections.add(selection);
         }
         return selections;
     }
 
-
-
     @Override
     public T dispense(E selection) {
 
-        initSelectionQueue(selection);
-
+        initSelectionInventory(selection);
         T t = inventory.get(selection)
                 .poll();
         if (t == null) {
@@ -68,7 +63,7 @@ public abstract class AbstractSelfRefillingSelectionDispenser<T, E> extends Abst
     }
 
     public void refillSelection(E selection) {
-        new RefillRunnable(selection).run();
+        executorService.submit(new RefillRunnable(selection));
     }
 
     protected class RefillRunnable implements Runnable {
@@ -79,7 +74,7 @@ public abstract class AbstractSelfRefillingSelectionDispenser<T, E> extends Abst
         }
 
         public void run() {
-            initSelectionQueue(selection);
+            initSelectionInventory(selection);
             synchronized (selection) {
                 Queue<T> queue = inventory.get(selection);
                 final int actualCount = queue.size();
@@ -89,7 +84,7 @@ public abstract class AbstractSelfRefillingSelectionDispenser<T, E> extends Abst
                 }
                 final int diff = desiredCount - actualCount;
 
-                /*Use order size of 1 since inventory is only
+                /*Use order batches of 1 since inventory is only
                 available after entire order has been fulfilled*/
                 for (int i = 0; i < diff; i++) {
                     Map<E, Integer> order = new ConcurrentHashMap<E, Integer>();
