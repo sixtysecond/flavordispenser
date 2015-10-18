@@ -13,7 +13,7 @@ public class SelfRefillingSelectionDispenserTest {
 
 
     public BlockingSelfRefillingSelectionDispenser<Crayon, CrayonColor> getCrayonDispenser() {
-        return new BlockingSelfRefillingSelectionDispenser<Crayon, CrayonColor>(new CrayonFactory(), null);
+        return new BlockingSelfRefillingSelectionDispenser<Crayon, CrayonColor>(new CrayonFactory());
     }
 
     @Test
@@ -34,7 +34,8 @@ public class SelfRefillingSelectionDispenserTest {
         desiredInventory.put(CrayonColor.BLUE, expectedBlueCount);
         desiredInventory.put(CrayonColor.GREEN, expectedGreenCount);
         BlockingSelfRefillingSelectionDispenser<Crayon, CrayonColor> dispenser =
-                new BlockingSelfRefillingSelectionDispenser<Crayon, CrayonColor>(new CrayonFactory(), desiredInventory);
+                new BlockingSelfRefillingSelectionDispenser<Crayon, CrayonColor>(new CrayonFactory());
+        dispenser.setDesiredInventory(desiredInventory);
         Thread.sleep(100);
 
         Assert.assertEquals(dispenser.getSelectionInventoryCount(CrayonColor.BLUE), expectedBlueCount);

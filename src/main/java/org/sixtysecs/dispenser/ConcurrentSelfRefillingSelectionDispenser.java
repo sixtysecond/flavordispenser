@@ -8,17 +8,13 @@ import java.util.concurrent.*;
  */
 public class ConcurrentSelfRefillingSelectionDispenser<T, E> extends AbstractSelfRefillingSelectionDispenser<T, E> {
 
-    protected ExecutorService executorService;
+    protected ExecutorService executorService = Executors.newCachedThreadPool();
     protected SelectionFactory<T, E> selectionFactory;
     protected Map<E, Integer> desiredInventory;
 
 
-    public ConcurrentSelfRefillingSelectionDispenser(SelectionFactory<T, E> selectionFactory, Map<E, Integer> desiredInventory,
-                                                     int nThreads) {
-        this.selectionFactory = selectionFactory;
-        setDesiredInventory(desiredInventory);
-        executorService = Executors.newFixedThreadPool(nThreads);
-        refillInventory();
+    public ConcurrentSelfRefillingSelectionDispenser(SelectionFactory<T, E> selectionFactory) {
+        super(selectionFactory);
     }
 
     public void refillInventory() {
@@ -62,7 +58,9 @@ public class ConcurrentSelfRefillingSelectionDispenser<T, E> extends AbstractSel
                 final int actualCount = queue.size();
                 final int desiredCount = desiredInventory.get(selection);
                 final int diff = desiredCount - actualCount;
-                //Use order size of 1 since inventory is only available after entire order has been fulfilled
+
+                /*Use order size of 1 since inventory is only
+                available after entire order has been fulfilled*/
                 for (int i = 0; i < diff; i++) {
                     Map<E, Integer> order = new ConcurrentHashMap<E, Integer>();
                     order.put(selection, 1);

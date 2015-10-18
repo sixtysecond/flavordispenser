@@ -13,9 +13,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class BlockingSelfRefillingSelectionDispenser<T, E> extends AbstractSelfRefillingSelectionDispenser<T, E> {
 
 
-    public BlockingSelfRefillingSelectionDispenser(SelectionFactory<T, E> selectionFactory,
-                                                   Map<E, Integer> desiredInventory) {
-        super(selectionFactory, desiredInventory);
+    public BlockingSelfRefillingSelectionDispenser(SelectionFactory<T, E> selectionFactory) {
+        super(selectionFactory);
     }
 
     @Override
