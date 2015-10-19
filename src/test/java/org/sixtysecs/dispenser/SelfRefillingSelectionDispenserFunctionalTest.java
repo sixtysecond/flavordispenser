@@ -81,4 +81,13 @@ public class SelfRefillingSelectionDispenserFunctionalTest {
         Crayon crayon = dispenser.dispense(CrayonColor.BLUE);
         Assert.assertEquals(dispenser.getSelectionInventoryCount(CrayonColor.BLUE), 0);
     }
+
+    @Test
+    public void createInventoryTest() throws InterruptedException {
+        SelfRefillingSelectionDispenser<Crayon, CrayonColor> dispenser = getCrayonDispenser();
+        Assert.assertEquals(dispenser.getSelectionInventoryCount(CrayonColor.BLUE), 0);
+        dispenser.createInventory(CrayonColor.BLUE, 3);
+        Thread.sleep(20);
+        Assert.assertEquals(dispenser.getSelectionInventoryCount(CrayonColor.BLUE), 3);
+    }
 }

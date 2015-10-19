@@ -56,6 +56,10 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
         return t;
     }
 
+    public void createInventory( E selection, int count) {
+        executorService.submit(new AddItemsRunnable(selection, count));
+    }
+
     protected void refillInventory() {
         for (E selection : getSelections()) {
             refillSelection(selection);
@@ -63,7 +67,9 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
     }
 
     protected void refillSelection(E selection) {
+
         executorService.submit(new RefillRunnable(selection));
+
     }
 
     protected class RefillRunnable implements Runnable {
@@ -83,10 +89,24 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
                     desiredCount = 0;
                 }
                 final int diff = desiredCount - actualCount;
+                executorService.submit(new AddItemsRunnable(selection, diff));
 
-                for (int i = 0; i < diff; i++) {
-                    executorService.submit(new AddItemRunnable(selection));
-                }
+            }
+        }
+    }
+
+    protected class AddItemsRunnable implements Runnable {
+        E selection;
+        int count;
+
+        AddItemsRunnable(E selection, int count) {
+            this.selection = selection;
+            this.count = count;
+        }
+
+        public void run() {
+            for (int i = 0; i < count; i++) {
+                executorService.submit(new AddItemRunnable(selection));
             }
         }
     }
@@ -97,6 +117,7 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
         AddItemRunnable(E selection) {
             this.selection = selection;
         }
+
         public void run() {
             addInventory(selection, selectionFactory.createItem(selection));
         }
