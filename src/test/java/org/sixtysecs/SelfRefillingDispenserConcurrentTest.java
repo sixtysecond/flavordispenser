@@ -57,6 +57,38 @@ public class SelfRefillingDispenserConcurrentTest {
     }
 
     @Test
+    public void fifoNoInventoryRequestsTest2() throws InterruptedException {
+
+        TurnstileEventFactory turnstileEventFactory = new TurnstileEventFactory(100);
+
+        SelfRefillingSelectionDispenser<TurnstileEvent, TurnstileLane> dispenser =
+                new SelfRefillingSelectionDispenser<TurnstileEvent, TurnstileLane>(turnstileEventFactory);
+
+        DispenseCallable callable1 = new DispenseCallable(TurnstileLane.ONE, dispenser);
+        DispenseCallable callable2 = new DispenseCallable(TurnstileLane.TWO, dispenser);
+        DispenseCallable callable3 = new DispenseCallable(TurnstileLane.THREE, dispenser);
+        executorService.submit(callable1);
+        executorService.submit(callable2);
+        executorService.submit(callable3);
+
+        assertFalse(callable1.isComplete);
+        assertFalse(callable2.isComplete);
+        assertFalse(callable3.isComplete);
+
+        turnstileEventFactory.fireEvent(TurnstileLane.ONE);
+        Thread.sleep(40);
+        assertTrue(callable1.isComplete);
+
+        turnstileEventFactory.fireEvent(TurnstileLane.TWO);
+        Thread.sleep(40);
+        assertTrue(callable2.isComplete);
+
+        turnstileEventFactory.fireEvent(TurnstileLane.THREE);
+        Thread.sleep(40);
+        assertTrue(callable3.isComplete);
+    }
+
+    @Test
     public void lifoNoInventoryRequestsTest() throws InterruptedException {
 
         TurnstileEventFactory turnstileEventFactory = new TurnstileEventFactory(100);
