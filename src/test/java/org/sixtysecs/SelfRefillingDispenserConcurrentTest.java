@@ -18,7 +18,7 @@ public class SelfRefillingDispenserConcurrentTest {
     ExecutorService executorService = Executors.newCachedThreadPool();
 
     @Test
-    public void fifoRequestsTest() throws InterruptedException {
+    public void fifoNoInventoryRequestsTest() throws InterruptedException {
 
         TurnstileEventFactory turnstileEventFactory = new TurnstileEventFactory(100);
 
@@ -50,7 +50,7 @@ public class SelfRefillingDispenserConcurrentTest {
     }
 
     @Test
-    public void lifoRequestsTest() throws InterruptedException {
+    public void lifoNoInventoryRequestsTest() throws InterruptedException {
 
         TurnstileEventFactory turnstileEventFactory = new TurnstileEventFactory(100);
 
@@ -83,11 +83,44 @@ public class SelfRefillingDispenserConcurrentTest {
 
     }
 
+    @Test
+    public void dispenseNotWaitIfInventoryExistsTest() throws InterruptedException {
+
+        TurnstileEventFactory turnstileEventFactory = new TurnstileEventFactory(100);
+
+        SelfRefillingSelectionDispenser<TurnstileEvent, TurnstileLane> dispenser =
+                new SelfRefillingSelectionDispenser<TurnstileEvent, TurnstileLane>(turnstileEventFactory);
+
+        DispenseCallable callable1 = new DispenseCallable(TurnstileLane.ONE, dispenser);
+        DispenseCallable callable2 = new DispenseCallable(TurnstileLane.TWO, dispenser);
+        DispenseCallable callable3 = new DispenseCallable(TurnstileLane.THREE, dispenser);
+
+
+        executorService.submit(callable3);
+        executorService.submit(callable2);
+        executorService.submit(callable1);
+
+        turnstileEventFactory.fireEvent(TurnstileLane.ONE);
+        turnstileEventFactory.fireEvent(TurnstileLane.TWO);
+        Thread.sleep(40);
+
+        assertTrue(callable1.isComplete);
+        assertTrue(callable2.isComplete);
+        assertFalse(callable3.isComplete);
+
+        turnstileEventFactory.fireEvent(TurnstileLane.THREE);
+        Thread.sleep(40);
+
+        assertTrue(callable3.isComplete);
+    }
+
+
     private class DispenseCallable implements Callable<TurnstileEvent> {
 
         private boolean isComplete = false;
         private TurnstileLane turnstileLane;
         private SelfRefillingSelectionDispenser<TurnstileEvent, TurnstileLane> dispenser;
+
         DispenseCallable(TurnstileLane turnstilLane, SelfRefillingSelectionDispenser<TurnstileEvent, TurnstileLane> dispenser) {
             this.turnstileLane = turnstilLane;
             this.dispenser = dispenser;
