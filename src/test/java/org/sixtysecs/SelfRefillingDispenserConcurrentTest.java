@@ -3,7 +3,9 @@ package org.sixtysecs;
 import org.junit.Test;
 import org.sixtysecs.dispenser.SelfRefillingSelectionDispenser;
 import org.sixtysecs.dispenser.turnstyle.*;
+import org.testng.annotations.BeforeMethod;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.*;
 
 import static org.testng.AssertJUnit.assertFalse;
@@ -14,8 +16,13 @@ import static org.testng.AssertJUnit.assertTrue;
  */
 public class SelfRefillingDispenserConcurrentTest {
 
-
     ExecutorService executorService = Executors.newCachedThreadPool();
+
+    @BeforeMethod
+    public void nameBefore(Method method)
+    {
+        System.out.println("==== " +  getClass().getSimpleName() + "::" + method.getName() + " ====");
+    }
 
     @Test
     public void fifoNoInventoryRequestsTest() throws InterruptedException {

@@ -1,9 +1,11 @@
 package org.sixtysecs.dispenser;
 
-import org.testng.annotations.Test;
 import org.sixtysecs.dispenser.crayon.*;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -11,6 +13,11 @@ import java.util.*;
  */
 public class SelfRefillingSelectionDispenserFunctionalTest {
 
+    @BeforeMethod
+    public void nameBefore(Method method)
+    {
+        System.out.println("==== " +  getClass().getSimpleName() + "::" + method.getName() + " ====");
+    }
 
     public SelfRefillingSelectionDispenser<Crayon, CrayonColor> getCrayonDispenser() {
         return new SelfRefillingSelectionDispenser<Crayon, CrayonColor>(new CrayonFactory());

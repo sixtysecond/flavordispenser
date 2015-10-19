@@ -1,11 +1,21 @@
 package org.sixtysecs.util.dispenser;
 
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.lang.reflect.Method;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 public class AbstractFlavorDispenserTest {
+
+	@BeforeMethod
+	public void nameBefore(Method method)
+	{
+		System.out.println("==== " +  getClass().getSimpleName() + "::" + method.getName() + " ====");
+	}
+
 
 	@Test
 	public void dispenseTest() {

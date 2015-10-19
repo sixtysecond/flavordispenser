@@ -2,8 +2,10 @@ package org.sixtysecs.dispenser.turnstyle;
 
 import com.sun.corba.se.impl.orbutil.threadpool.TimeoutException;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.*;
 
 /**
@@ -12,6 +14,11 @@ import java.util.concurrent.*;
 @Test(singleThreaded=true, threadPoolSize=1)
 public class TurnstileEventTest {
 
+    @BeforeMethod
+    public void nameBefore(Method method)
+    {
+        System.out.println("==== " +  getClass().getSimpleName() + "::" + method.getName() + " ====");
+    }
 
     @Test(expectedExceptions = {TimeoutException.class})
     public void waitTimeouExceededTest() throws TimeoutException {

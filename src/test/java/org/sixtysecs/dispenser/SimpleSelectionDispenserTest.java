@@ -1,16 +1,24 @@
 package org.sixtysecs.dispenser;
 
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.sixtysecs.dispenser.crayon.Crayon;
 import org.sixtysecs.dispenser.crayon.CrayonColor;
 import org.testng.Assert;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
  * Created by edriggs on 10/11/15.
  */
 public class SimpleSelectionDispenserTest {
+
+    @BeforeMethod
+    public void nameBefore(Method method)
+    {
+        System.out.println("==== " +  getClass().getSimpleName() + "::" + method.getName() + " ====");
+    }
 
     public SimpleSelectionDispenser<Crayon, CrayonColor> getCrayonDispenser() {
         return new SimpleSelectionDispenser<Crayon, CrayonColor>();

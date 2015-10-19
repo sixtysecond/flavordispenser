@@ -1,8 +1,10 @@
 package org.sixtysecs.dispenser;
 
 
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -10,6 +12,13 @@ import java.util.concurrent.Executors;
  * Created by edriggs on 10/16/15.
  */
 public class BackgroundThreadTest {
+
+    @BeforeMethod
+    public void nameBefore(Method method)
+    {
+        System.out.println("==== " +  getClass().getSimpleName() + "::" + method.getName() + " ====");
+    }
+
 
     ExecutorService executorService = Executors.newFixedThreadPool(20);
 

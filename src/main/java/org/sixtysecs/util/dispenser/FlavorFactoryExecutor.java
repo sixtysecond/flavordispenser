@@ -53,7 +53,7 @@ class FlavorFactoryExecutor<T, E extends Enum<E>> {
 
 	/**
 	 * Attempts to create an instance for each flavor specified in flavor list.
-	 * No guarantee all requested flavors or flavor counts will be instantiated.
+	 * There is no guarantee all requested flavors or flavor counts will be instantiated.
 	 * 
 	 * @return a map containing flavors and a list of each instance for that
 	 *         flavor. Each list will never be <code>NULL</code>, but may be
@@ -135,6 +135,7 @@ class FlavorFactoryExecutor<T, E extends Enum<E>> {
 			for (E flavor : flavorFactory.getAllFlavors()) {
 				expectedSize += flavorInstanceListMap.get(flavor).size();
 			}
+
 
 			if (expectedSize != actualSize) {
 				logger.warn("Expected flavorFutureInstanceListMap size:"
