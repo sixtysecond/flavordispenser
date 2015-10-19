@@ -1,7 +1,5 @@
 package org.sixtysecs.dispenser;
 
-import org.apache.commons.collections.CollectionUtils;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -27,7 +25,6 @@ public abstract class AbstractSelectionDispenser<T, E> implements SelectionDispe
                 inventory.put(selection, new ConcurrentLinkedQueue<T>());
             }
         }
-
     }
 
 
@@ -50,21 +47,10 @@ public abstract class AbstractSelectionDispenser<T, E> implements SelectionDispe
     public abstract T dispense(E selection);
 
 
-    public final void addInventory(Map<E, Collection<T>> newInventory) {
+    public final void addInventory(E selection, T newItem) {
 
-        /**
-         * Ensure that an inventory collection exists for each E in newInventory
-         */
-        for (Map.Entry<E, Collection<T>> entry : newInventory.entrySet()) {
-            initSelectionInventory(entry.getKey());
-        }
-        for (Map.Entry<E, Collection<T>> entry : newInventory.entrySet()) {
-            if (!CollectionUtils.isEmpty(entry.getValue())) {
-                inventory.get(entry.getKey())
-                        .addAll(entry.getValue());
-            }
-        }
+        initSelectionInventory(selection);
+        inventory.get(selection)
+                .add(newItem);
     }
-
-
 }

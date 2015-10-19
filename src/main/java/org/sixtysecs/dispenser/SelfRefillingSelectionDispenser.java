@@ -56,13 +56,13 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
         return t;
     }
 
-    public void refillInventory() {
+    protected void refillInventory() {
         for (E selection : getSelections()) {
             refillSelection(selection);
         }
     }
 
-    public void refillSelection(E selection) {
+    protected void refillSelection(E selection) {
         executorService.submit(new RefillRunnable(selection));
     }
 
@@ -84,14 +84,21 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
                 }
                 final int diff = desiredCount - actualCount;
 
-                /*Use order batches of 1 since inventory is only
-                available after entire order has been fulfilled*/
                 for (int i = 0; i < diff; i++) {
-                    Map<E, Integer> order = new ConcurrentHashMap<E, Integer>();
-                    order.put(selection, 1);
-                    addInventory(selectionFactory.fulfill(order));
+                    executorService.submit(new AddItemRunnable(selection));
                 }
             }
+        }
+    }
+
+    protected class AddItemRunnable implements Runnable {
+        E selection;
+
+        AddItemRunnable(E selection) {
+            this.selection = selection;
+        }
+        public void run() {
+            addInventory(selection, selectionFactory.createItem(selection));
         }
     }
 }

@@ -35,18 +35,14 @@ public class SimpleSelectionDispenserTest {
     @Test
     public void hasItemsAfterRefillTest() {
         SimpleSelectionDispenser<Crayon, CrayonColor> dispenser = getCrayonDispenser();
-        Map<CrayonColor, Collection<Crayon>> newInventory = new HashMap<CrayonColor, Collection<Crayon>>();
-        newInventory.put(CrayonColor.BLUE, Arrays.asList(new Crayon(CrayonColor.BLUE)));
-        dispenser.addInventory(newInventory);
+        dispenser.addInventory(CrayonColor.BLUE, new Crayon(CrayonColor.BLUE));
         Assert.assertEquals(dispenser.getSelectionInventoryCount(CrayonColor.BLUE), 1);
     }
 
     @Test
     public void inventoryDecreasesAfterDispenseTest() {
         SimpleSelectionDispenser<Crayon, CrayonColor> dispenser = getCrayonDispenser();
-        Map<CrayonColor, Collection<Crayon>> newInventory = new HashMap<CrayonColor, Collection<Crayon>>();
-        newInventory.put(CrayonColor.BLUE, Arrays.asList(new Crayon(CrayonColor.BLUE)));
-        dispenser.addInventory(newInventory);
+        dispenser.addInventory(CrayonColor.BLUE, new Crayon(CrayonColor.BLUE));
         Crayon crayon = dispenser.dispense(CrayonColor.BLUE);
         Assert.assertNotNull(crayon);
         Assert.assertEquals(crayon.getCrayonColor(), CrayonColor.BLUE);

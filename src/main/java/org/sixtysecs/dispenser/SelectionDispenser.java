@@ -31,8 +31,8 @@ public interface SelectionDispenser<T, E> {
 
 
     /**
-     * @param newInventory adds the new inventory to the existing inventory.
-     *                     for each E in the map, adds the collection of T to that selection's inventory
+     * @param newItem adds the new item to the existing inventory.
+     *
      */
-    public void addInventory(Map<E, Collection<T>> newInventory);
+    public void addInventory(E selection, T newItem);
 }
