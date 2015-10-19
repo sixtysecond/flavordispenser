@@ -10,7 +10,6 @@ import java.util.*;
  */
 public class AbstractSelectionFactoryTest{
     @Test
-
     public void fullFillOrderNumersTest() {
         CrayonFactory crayonFactory = new CrayonFactory();
         Map<CrayonColor, Integer> order = new HashMap<CrayonColor, Integer>();
@@ -23,6 +22,7 @@ public class AbstractSelectionFactoryTest{
         Assert.assertEquals(newInventory.get(CrayonColor.RED).size(), 4);
     }
 
+    @Test
     public void fullFillOrderNullTest() {
         CrayonFactory crayonFactory = new CrayonFactory();
         Map<CrayonColor, Integer> order = new HashMap<CrayonColor, Integer>();
@@ -30,8 +30,8 @@ public class AbstractSelectionFactoryTest{
         order.put(CrayonColor.GREEN, null);
 
         Map<CrayonColor, Collection<Crayon>> newInventory = crayonFactory.fulfill(order);
-        Assert.assertEquals(newInventory.get(CrayonColor.BLUE).size(), 0);
-        Assert.assertEquals(newInventory.get(CrayonColor.GREEN).size(), 0);
-        Assert.assertEquals(newInventory.get(CrayonColor.RED).size(), 0);
+        Assert.assertNull(newInventory.get(CrayonColor.BLUE));
+        Assert.assertNull(newInventory.get(CrayonColor.GREEN));
+        Assert.assertNull(newInventory.get(CrayonColor.RED));
     }
 }

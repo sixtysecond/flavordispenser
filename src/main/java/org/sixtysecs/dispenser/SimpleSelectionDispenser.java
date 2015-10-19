@@ -1,7 +1,5 @@
 package org.sixtysecs.dispenser;
 
-import java.util.Queue;
-
 /**
  * A thread-safe blocking dispenser
  *
@@ -10,11 +8,8 @@ import java.util.Queue;
 public class SimpleSelectionDispenser<T, E> extends AbstractSelectionDispenser<T, E> {
 
     public T dispense(E selection) {
-        Queue<T> queue = inventory.get(selection);
-        if (queue == null) {
-            return null;
-        }
-        return queue.poll();
+        initSelectionInventory(selection);
+        return inventory.get(selection).poll();
     }
 
 }
