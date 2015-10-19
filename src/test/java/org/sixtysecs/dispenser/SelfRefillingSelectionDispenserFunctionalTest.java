@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Created by edriggs on 10/11/15.
  */
-public class SelfRefillingSelectionDispenserTest {
+public class SelfRefillingSelectionDispenserFunctionalTest {
 
 
     public SelfRefillingSelectionDispenser<Crayon, CrayonColor> getCrayonDispenser() {

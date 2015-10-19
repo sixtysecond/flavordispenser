@@ -10,7 +10,7 @@ import java.util.concurrent.*;
  * Created by edriggs on 10/11/15.
  */
 @Test(singleThreaded=true, threadPoolSize=1)
-public class TurnstyleLaneEventTest {
+public class TurnstileEventTest {
 
 
     @Test(expectedExceptions = {TimeoutException.class})
