@@ -1,6 +1,6 @@
 package org.sixtysecs.dispenser.turnstyle;
 
-import org.sixtysecs.dispenser.AbstractSelectionFactory;
+import org.sixtysecs.dispenser.SelectionFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 /**
  * Created by edriggs on 10/18/15.
  */
-public class TurnstileEventFactory extends AbstractSelectionFactory<TurnstileEvent, TurnstileLane > {
+public class TurnstileEventFactory implements SelectionFactory<TurnstileEvent, TurnstileLane > {
 
     ExecutorService executorService = Executors.newCachedThreadPool();
     private TurnstileController turnstileController = new TurnstileController();
@@ -27,7 +27,6 @@ public class TurnstileEventFactory extends AbstractSelectionFactory<TurnstileEve
      * @param selection
      * @return a TurnstileEvent after an event has been fired for the selected lane, or <code>NULL</code> if timeout
      */
-    @Override
     public TurnstileEvent createItem(TurnstileLane selection) {
 
         TurnstileEvent turnstileEvent = null;

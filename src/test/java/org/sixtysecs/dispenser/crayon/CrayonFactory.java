@@ -1,13 +1,12 @@
 package org.sixtysecs.dispenser.crayon;
 
-import org.sixtysecs.dispenser.AbstractSelectionFactory;
+import org.sixtysecs.dispenser.SelectionFactory;
 
 /**
  * Example factory for refilling selection dispenser
  */
-public class CrayonFactory extends AbstractSelectionFactory<Crayon, CrayonColor> {
+public class CrayonFactory implements SelectionFactory<Crayon, CrayonColor> {
 
-    @Override
     public Crayon createItem(CrayonColor selection) {
         return new Crayon(selection);
     }

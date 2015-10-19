@@ -7,6 +7,8 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
     protected final SelectionFactory<T, E> selectionFactory;
     protected volatile Map<E, Integer> desiredInventory = new ConcurrentHashMap<E, Integer>();
     protected ExecutorService executorService = Executors.newCachedThreadPool();
+    protected TimeUnit refillWaitTimeUnit;
+    protected long refillWaitCount;
 
     private SelfRefillingSelectionDispenser() {
         throw new UnsupportedOperationException("selectionFactory must be set in constructor");
@@ -34,6 +36,19 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
         return this;
     }
 
+    public void setRefillTimeOut(TimeUnit timeUnit, long count) {
+        this.refillWaitCount = 1;
+        this.refillWaitTimeUnit = TimeUnit.MINUTES;
+    }
+
+    public TimeUnit getRefillWaitTimeUnit() {
+        return refillWaitTimeUnit;
+    }
+
+    public long getRefillWaitCount() {
+        return refillWaitCount;
+    }
+
     @Override
     public Set<E> getSelections() {
         Set<E> selections = super.getSelections();
@@ -56,7 +71,7 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
         return t;
     }
 
-    public void createInventory( E selection, int count) {
+    public void createInventory(E selection, int count) {
         executorService.submit(new AddItemsRunnable(selection, count));
     }
 
@@ -67,21 +82,22 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
     }
 
     protected void refillSelection(E selection) {
-
-        executorService.submit(new RefillRunnable(selection));
-
+        executorService.submit(new RefillSelectionCallable(selection));
     }
 
-    protected class RefillRunnable implements Runnable {
+
+    protected class RefillSelectionCallable implements Callable {
         E selection;
 
-        RefillRunnable(E selection) {
+        RefillSelectionCallable(E selection) {
             this.selection = selection;
         }
 
-        public void run() {
+        public Boolean call() throws InterruptedException {
             initSelectionInventory(selection);
+
             synchronized (selection) {
+                ExecutorService refillExecutorService = Executors.newCachedThreadPool();
                 Queue<T> queue = inventory.get(selection);
                 final int actualCount = queue.size();
                 Integer desiredCount = desiredInventory.get(selection);
@@ -89,10 +105,39 @@ public class SelfRefillingSelectionDispenser<T, E> extends AbstractSelectionDisp
                     desiredCount = 0;
                 }
                 final int diff = desiredCount - actualCount;
-                executorService.submit(new AddItemsRunnable(selection, diff));
 
+                for (int i = 0; i < diff; i++) {
+                    refillExecutorService.submit(new RefillSelectionItemRunnable(selection));
+                }
+                refillExecutorService.shutdown();
+                refillExecutorService.awaitTermination(refillWaitCount, refillWaitTimeUnit);
             }
+            return true;
         }
+
+    }
+
+    protected class RefillSelectionItemRunnable implements Runnable {
+        E selection;
+
+        RefillSelectionItemRunnable(E selection) {
+            this.selection = selection;
+        }
+
+        public void run() {
+            initSelectionInventory(selection);
+            Queue<T> queue = inventory.get(selection);
+            final int actualCount = queue.size();
+            Integer desiredCount = desiredInventory.get(selection);
+            if (desiredCount == null) {
+                desiredCount = 0;
+            }
+            if (desiredCount > actualCount) {
+                executorService.submit(new AddItemRunnable(selection));
+            }
+
+        }
+
     }
 
     protected class AddItemsRunnable implements Runnable {

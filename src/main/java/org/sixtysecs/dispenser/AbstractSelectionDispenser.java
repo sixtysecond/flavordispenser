@@ -44,6 +44,11 @@ public abstract class AbstractSelectionDispenser<T, E> implements SelectionDispe
         return selectionInventory.size();
     }
 
+    /**
+     * Note: Must call initSelectionInventory before dispensing to prevent null pointer
+     * @param selection Determines which inventory to dispense from. Similar to a product button on a vending machine.
+     * @return
+     */
     public abstract T dispense(E selection);
 
 
